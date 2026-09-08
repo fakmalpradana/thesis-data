@@ -1,0 +1,10 @@
+DEM/
+reference/_archive/
+reference/batas_adm/*.rar
+reference/jakarta/.claude/
+__pycache__/
+*.pyc
+.netrc
+.cdsapirc
+*.duckdb.wal
+.DS_Store

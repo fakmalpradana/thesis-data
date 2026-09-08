@@ -1,0 +1,19 @@
+base_url: "https://poskobanjir.dsdadki.web.id/Pages/GenerateDataTinggiAir.aspx"
+user_agent: "ThesisResearchBot/0.1 (+contact: fakmalpradana@gmail.com; academic use, UGM thesis)"
+
+# lihat docs/DISCOVERY.md §4 - 90 hari teruji aman tanpa truncation/timeout
+chunk_days: 90
+
+# jeda acak antar request (detik) - server publik untuk peringatan dini banjir
+delay_min_s: 3
+delay_max_s: 6
+
+max_retries: 3
+retry_backoff_base_s: 2
+request_timeout_s: 45
+
+timezone: "Asia/Jakarta"
+
+# default range kalau --start/--end tidak diberikan di CLI
+default_start: "01/08/2026"
+default_end: "07/09/2026"

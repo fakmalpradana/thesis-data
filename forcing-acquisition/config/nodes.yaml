@@ -1,0 +1,18 @@
+# Titik forcing per-node untuk MVP (brief §0: model satu-node). TMA
+# stasiun tidak punya koordinat di portal sumber (lihat ../../tinggi_air/docs/DISCOVERY.md
+# §3) - dicari manual via OSM Overpass (nama tempat, bukan lokasi pintu air
+# presisi). Cukup akurat untuk grid pasut 1/8deg (~14km); TIDAK cukup presisi
+# untuk klaim posisi meter-level di tesis - nyatakan sebagai perkiraan.
+mvp_node:
+  tma_stasiun_id: 140
+  tma_stasiun_nama: "P.A. Marina Ancol (Laut)"
+  lon: 106.8291
+  lat: -6.1215
+  koordinat_sumber: "OSM Overpass, nama 'Marina Ancol' - perkiraan lokasi pelabuhan/marina, bukan titik pintu air presisi"
+  # Titik di atas jatuh di sel darat pada grid EOT20 1/8deg (garis pantai
+  # Jakarta terlalu detail untuk resolusi ~14km ini). Untuk prediksi pasut,
+  # dipakai sel basah terdekat (src/sources/tide.py:nearest_wet_point):
+  eot20_wet_point:
+    lon: 106.875
+    lat: -6.0
+    jarak_deg: 0.13

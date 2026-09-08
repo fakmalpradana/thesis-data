@@ -1,0 +1,22 @@
+# Domain spasial/temporal kanonik - dipakai semua modul sumber.
+# bbox: PROVISIONAL, dari brief §0. Ini bbox DKI Jakarta + sedikit selatan,
+# BUKAN batas DAS Ciliwung sebenarnya (hulu DAS Ciliwung meluas ke Puncak/Bogor,
+# ~lat -6.7 s/d -6.9 - jauh di luar box ini). Tidak ada shapefile DAS Ciliwung
+# di data/ lokal untuk verifikasi presisi (lihat docs/SOURCE_NOTES.md).
+# Untuk MVP satu-node (Manggarai/Marina Ancol, prediksi jam-an), sinyal hujan
+# hulu yang relevan untuk lag t+1..t+6 jam kemungkinan sudah cukup terwakili
+# oleh box ini karena waktu tempuh Ciliwung hulu-hilir biasanya >6 jam - tapi
+# ini asumsi, bukan hasil verifikasi DAS. Kunci ulang kalau ada shapefile DAS.
+bbox:
+  lon_min: 106.6
+  lat_min: -6.5
+  lon_max: 107.1
+  lat_max: -6.0
+
+crs: "EPSG:4326"       # penyimpanan. Reproyeksi hanya di tahap analisis.
+timezone: "Asia/Jakarta"
+
+# Periode training default (brief kriteria selesai #3: >=3 tahun).
+period:
+  start: "2021-01-01"
+  end: "2026-09-07"

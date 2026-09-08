@@ -1,0 +1,235 @@
+stations:
+- id: 129
+  nama: Cikeas
+  ambang_siaga_cm:
+    siaga1: null
+    siaga2: null
+    siaga3: null
+- id: 155
+  nama: Bendung. Cibalok - Gadog 1
+  ambang_siaga_cm:
+    siaga1: null
+    siaga2: null
+    siaga3: null
+- id: 116
+  nama: Bendung. Katulampa 2
+  ambang_siaga_cm:
+    siaga1: null
+    siaga2: null
+    siaga3: null
+- id: 118
+  nama: P.S. Depok 2
+  ambang_siaga_cm:
+    siaga1: null
+    siaga2: null
+    siaga3: null
+- id: 176
+  nama: Waduk Kampung Rambutan 1
+  ambang_siaga_cm:
+    siaga1: null
+    siaga2: null
+    siaga3: null
+- id: 122
+  nama: P.A. Manggarai 2
+  ambang_siaga_cm:
+    siaga1: 950.0
+    siaga2: 850.0
+    siaga3: 750.0
+- id: 114
+  nama: P.S. Krukut Hulu 2
+  ambang_siaga_cm:
+    siaga1: 300.0
+    siaga2: 250.0
+    siaga3: 150.0
+- id: 165
+  nama: Pompa Cideng 1
+  ambang_siaga_cm:
+    siaga1: null
+    siaga2: null
+    siaga3: null
+- id: 163
+  nama: P.A. Karet 1
+  ambang_siaga_cm:
+    siaga1: 600.0
+    siaga2: 550.0
+    siaga3: 450.0
+- id: 140
+  nama: P.A. Marina Ancol (Laut)
+  ambang_siaga_cm:
+    siaga1: 250.0
+    siaga2: 200.0
+    siaga3: 170.0
+- id: 166
+  nama: P.A. Marina Ancol (Kali)
+  ambang_siaga_cm:
+    siaga1: 250.0
+    siaga2: 200.0
+    siaga3: 170.0
+- id: 162
+  nama: Pompa Pasar Ikan 1
+  ambang_siaga_cm:
+    siaga1: null
+    siaga2: null
+    siaga3: null
+- id: 167
+  nama: Rumah Pompa Pluit 1
+  ambang_siaga_cm:
+    siaga1: 45.0
+    siaga2: 0.0
+    siaga3: -50.0
+- id: 160
+  nama: P.S. Pesanggrahan 1
+  ambang_siaga_cm:
+    siaga1: null
+    siaga2: null
+    siaga3: null
+- id: 158
+  nama: P.S. Angke Hulu 1
+  ambang_siaga_cm:
+    siaga1: null
+    siaga2: null
+    siaga3: null
+- id: 150
+  nama: P.S. Sunter Hulu
+  ambang_siaga_cm:
+    siaga1: null
+    siaga2: null
+    siaga3: null
+- id: 126
+  nama: P.A. Pulo Gadung 2
+  ambang_siaga_cm:
+    siaga1: null
+    siaga2: null
+    siaga3: null
+- id: 164
+  nama: Pompa Yos Sudarso 1
+  ambang_siaga_cm:
+    siaga1: 250.0
+    siaga2: 200.0
+    siaga3: 140.0
+- id: 169
+  nama: P.A. Kaliduri 1
+  ambang_siaga_cm:
+    siaga1: 320.0
+    siaga2: 270.0
+    siaga3: 220.0
+- id: 172
+  nama: P.A. Istiqlal 1
+  ambang_siaga_cm:
+    siaga1: null
+    siaga2: null
+    siaga3: null
+- id: 171
+  nama: P.A. Jembatan Merah 1
+  ambang_siaga_cm:
+    siaga1: null
+    siaga2: null
+    siaga3: null
+- id: 170
+  nama: P.A. Ancol Flushing 1
+  ambang_siaga_cm:
+    siaga1: 220.0
+    siaga2: 190.0
+    siaga3: 180.0
+- id: 107
+  nama: P.A. Cengkareng Drain
+  ambang_siaga_cm:
+    siaga1: 310.0
+    siaga2: 270.0
+    siaga3: 190.0
+- id: 179
+  nama: Pompa Kamal Muara (Bubble)
+  ambang_siaga_cm:
+    siaga1: 300.0
+    siaga2: 250.0
+    siaga3: 200.0
+- id: 181
+  nama: Pompa Kali Asin (Bubble)
+  ambang_siaga_cm:
+    siaga1: 300.0
+    siaga2: 250.0
+    siaga3: 200.0
+- id: 184
+  nama: Pompa Lagoa (Bubble)
+  ambang_siaga_cm:
+    siaga1: 300.0
+    siaga2: 250.0
+    siaga3: 200.0
+- id: 187
+  nama: Pompa Cilincing (Bubble)
+  ambang_siaga_cm:
+    siaga1: 300.0
+    siaga2: 250.0
+    siaga3: 200.0
+- id: 189
+  nama: Jembatan Pasir Jambu
+  ambang_siaga_cm:
+    siaga1: null
+    siaga2: null
+    siaga3: null
+- id: 191
+  nama: Jembatan Kuning Cikambangan
+  ambang_siaga_cm:
+    siaga1: null
+    siaga2: null
+    siaga3: null
+- id: 192
+  nama: Jembatan Jalan Raya Tapos
+  ambang_siaga_cm:
+    siaga1: null
+    siaga2: null
+    siaga3: null
+- id: 193
+  nama: Jembatan MT. Haryono
+  ambang_siaga_cm:
+    siaga1: null
+    siaga2: null
+    siaga3: null
+- id: 194
+  nama: Rumah Pompa Tipala
+  ambang_siaga_cm:
+    siaga1: null
+    siaga2: null
+    siaga3: null
+- id: 195
+  nama: Taman Jati Cimel
+  ambang_siaga_cm:
+    siaga1: null
+    siaga2: null
+    siaga3: null
+- id: 197
+  nama: Jembatan Jl. L. Malahayati
+  ambang_siaga_cm:
+    siaga1: null
+    siaga2: null
+    siaga3: null
+- id: 196
+  nama: Waduk Kaja Ciracas
+  ambang_siaga_cm:
+    siaga1: null
+    siaga2: null
+    siaga3: null
+- id: 198
+  nama: Jembatan Kali Krukut
+  ambang_siaga_cm:
+    siaga1: null
+    siaga2: null
+    siaga3: null
+- id: 199
+  nama: Rumah Pompa Kemang 2
+  ambang_siaga_cm:
+    siaga1: null
+    siaga2: null
+    siaga3: null
+- id: 200
+  nama: Rumah Pompa Atma Jaya
+  ambang_siaga_cm:
+    siaga1: null
+    siaga2: null
+    siaga3: null
+- id: 201
+  nama: Posko SDA Palmerah
+  ambang_siaga_cm:
+    siaga1: null
+    siaga2: null
+    siaga3: null

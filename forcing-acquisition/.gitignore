@@ -1,0 +1,8 @@
+data/raw/
+data/static/
+data/interim/
+metadata/
+__pycache__/
+*.pyc
+.netrc
+.cdsapirc
