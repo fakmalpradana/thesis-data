@@ -10,6 +10,12 @@ thesis. Two pipelines, one catalog:
   (EOT20 tide model), drainase (OSM). See
   `forcing-acquisition/docs/SOURCE_NOTES.md`.
 
+- **`validation/`** — ground truth for evaluation: BPBD flood-event tables
+  (2019–2026Q1), DSDA pintu air / rumah pompa with coordinates, PetaBencana
+  crowdsourced reports (2021–2026), and `events.csv` — the curated list of
+  candidate events. Fetchers: `validation/src/fetch_satudata.py`,
+  `validation/src/fetch_petabencana.py`.
+
 ## Catalog
 
 `catalog.duckdb` indexes everything — both the processed parquet tracked in

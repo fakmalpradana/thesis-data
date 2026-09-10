@@ -8,3 +8,4 @@ __pycache__/
 .cdsapirc
 *.duckdb.wal
 .DS_Store
+__marimo__/

@@ -1,0 +1,8 @@
+event_id,start,end,type,tma_stations_gt_p99,chirps_rain_mm_day,tide_max_m,bpbd_jakut_kelurahan,bpbd_depth_range_cm,petabencana_jakut_reports,status,notes
+E1,2025-01-28,2025-01-29,pluvial+tidal,4,44,0.53,5,10-100,low,candidate,"Tide at p99 AND 44 mm rain -> compound; Pluit 17 kejadian, Rorotan up to 100 cm (BPBD 202503 bulan 1)"
+E2,2026-01-12,2026-01-22,pluvial,3-4 over 5 days,31-65,0.46,17,10-85,6 on 01-12,candidate,"Largest Jakut footprint in BPBD (37 RW); Kapuk Muara 85 cm, Marunda 60 cm (BPBD 202603 bulan 1)"
+E3,2025-02-08,2025-02-08,pluvial,3,17,,1,,low,candidate,"Ancol Flushing/Kaliduri/Marina Kali > p99; BPBD 202503 bulan 2 has 1 kelurahan"
+E4,2025-04-13,2025-04-20,local convective,0-1,7-13,0.29,1,,52,candidate,"PetaBencana burst (depth median 55-87 cm) with near-zero CHIRPS -> CHIRPS misses local cells; needs GSMaP"
+E5,2024-04-18,2024-04-18,local convective,0,15,0.19,1,,28,candidate,"Same pattern as E4; BPBD 2024 bulan 4 has 1 kelurahan"
+E6,2025-07-06,2025-07-07,compound (dry-season),2,19-38,0.43,2,,low,candidate,"Ancol stations only; BPBD 202509 bulan 7 has 2 kelurahan"
+E7,2026-06-02,2026-06-05,tidal (rob),2,0-3,,,,low,candidate,"Marina Laut + Lagoa > p99 with zero rain -> pure rob; check BPBD 202606 when published"

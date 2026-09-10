@@ -25,6 +25,19 @@ VIEWS = {
                         "TMA+hujan+pasut ter-align jam-an, node 140 (MVP)"),
     "tide_140": ("forcing-acquisition/data/processed/tide_140_2021_2026.parquet",
                  "Prediksi pasut EOT20, node 140, 2021-2026"),
+    "bpbd_banjir_2025_2026": ("validation/data/processed/data-kejadian-bencana-banjir.parquet",
+                              "BPBD kejadian banjir per kelurahan/bulan, 2025Q1-2026Q1"),
+    "bpbd_banjir_2024": ("validation/data/processed/data-kejadian-bencana-banjir-tahun-2024.parquet",
+                         "BPBD kejadian banjir per kelurahan/bulan, 2024"),
+    "bpbd_banjir_2023": ("validation/data/processed/data-kejadian-bencana-banjir-tahun-2023.parquet",
+                         "BPBD kejadian banjir per kelurahan/bulan, 2023"),
+    "bpbd_banjir_2020": ("validation/data/processed/data-kejadian-bencana-banjir-di-provinsi-dki-jakarta-tahun-2020.parquet",
+                         "BPBD kejadian banjir per RW dengan tanggal & lama genangan, 2020"),
+    "dsda_pintu_air": ("validation/data/processed/data-pintu-air.parquet", "DSDA pintu air + koordinat, 2024"),
+    "dsda_rumah_pompa": ("validation/data/processed/data-lokasi-rumah-pompa.parquet",
+                         "DSDA rumah pompa + koordinat + kapasitas, 2024"),
+    "petabencana_reports": ("validation/data/processed/petabencana_reports_jakarta.parquet",
+                            "PetaBencana.id laporan warga ber-geotag + kedalaman, DKI 2021-2026"),
 }
 
 # Explicit registry - includes gitignored raw/static files so the catalog
@@ -61,12 +74,32 @@ CATALOG_ROWS = [
      "reference (sumber tidak tercatat)", "Batas administrasi kecamatan DKI"),
     ("grid_25ha", "reference/jakarta/GRID_25HA.gpkg", "gpkg", "vector", True,
      "reference (analisis internal)", "Grid analisis 25 ha, Jakarta"),
+    ("bpbd_banjir_*", "validation/data/processed/data-kejadian-bencana-banjir*.parquet", "parquet", "tabular", True,
+     "satudata.jakarta.go.id (BPBD DKI) via validation/src/fetch_satudata.py",
+     "Kejadian banjir per kelurahan: 2019, 2020 (per RW + tanggal), 2021, 2023, 2024, 2025-2026Q1; ketinggian air, RW/KK terdampak"),
+    ("bpbd_rekap_2013_2020", "validation/data/processed/data-rekapitulasi-tahunan-kejadian-banjir-di-provinsi-dki-jakarta.parquet",
+     "parquet", "tabular", True, "satudata.jakarta.go.id (BPBD DKI)", "Rekap tahunan banjir per kelurahan 2013-2020"),
+    ("luasan_tergenang_2023", "validation/data/processed/luasan-daerah-tergenang-tahun-2023.parquet", "parquet", "tabular", True,
+     "satudata.jakarta.go.id (DSDA DKI)", "Luas genangan per RT 2022 vs 2023 (ha)"),
+    ("dsda_pintu_air", "validation/data/processed/data-pintu-air.parquet", "parquet", "tabular", True,
+     "satudata.jakarta.go.id (DSDA DKI)", "72 pintu air DKI + lat/lon + sistem aliran"),
+    ("dsda_rumah_pompa", "validation/data/processed/data-lokasi-rumah-pompa.parquet", "parquet", "tabular", True,
+     "satudata.jakarta.go.id (DSDA DKI)", "614 rumah pompa DKI + lat/lon + kapasitas"),
+    ("bpbd_titik_rawan", "validation/data/processed/data-titik-rawan-bencanabanjir.parquet", "parquet", "tabular", True,
+     "satudata.jakarta.go.id (BPBD DKI)", "154 titik rawan banjir + lat/lon (koordinat tanpa desimal, bagi 1e6)"),
+    ("events", "validation/events.csv", "csv", "tabular", True,
+     "hand-curated from tma_hourly + bpbd_banjir_* + petabencana_reports",
+     "Kandidat kejadian banjir Jakut 2024-2026 untuk validasi (E1-E7), status candidate/confirmed"),
+    ("petabencana_reports", "validation/data/processed/petabencana_reports_jakarta.parquet", "parquet", "tabular", True,
+     "data.petabencana.id archive API via validation/src/fetch_petabencana.py",
+     "19,325 laporan warga DKI 2021-2026 (12,000 banjir) + kedalaman cm + lat/lon"),
 ]
 
 
 def main() -> None:
     con = duckdb.connect(str(DB_PATH))
 
+    con.execute(f"CREATE OR REPLACE VIEW events AS SELECT * FROM read_csv('{ROOT / 'validation/events.csv'}')")
     for name, (glob, desc) in VIEWS.items():
         con.execute(f"CREATE OR REPLACE VIEW {name} AS SELECT * FROM read_parquet('{ROOT / glob}')")
         n = con.execute(f"SELECT count(*) FROM {name}").fetchone()[0]
