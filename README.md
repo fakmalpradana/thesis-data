@@ -23,6 +23,14 @@ Rebuild after any data change:
 python3 scripts/build_catalog.py
 ```
 
+**Visual explorer (marimo):** every dataset plotted interactively — TMA per
+stasiun, forcing node 140, CHIRPS day slider, DEM/DTM decimated view +
+histogram, all vector layers.
+
+```bash
+pip install marimo && marimo edit notebooks/explore.py
+```
+
 **Browse it:**
 - Tabular data (TMA, forcing, tide series): open `catalog.duckdb` in
   [DBeaver](https://dbeaver.io/) (built-in DuckDB driver) or run
