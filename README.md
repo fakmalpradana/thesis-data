@@ -4,7 +4,8 @@ Data acquisition + catalog for a PINN-LSTM Jakarta Utara flood forecasting
 thesis. Two pipelines, one catalog:
 
 - **`tinggi_air/`** — TMA (tinggi muka air, water level) scraper, the
-  model's label/target. 11 pintu air stasiun, 2021-2026. See
+  model's label/target. 14 Jakut pintu air/pompa stasiun (140 from 2021,
+  the rest from Nov 2023). See
   `tinggi_air/docs/DISCOVERY.md`.
 - **`forcing-acquisition/`** — forcing/input data: hujan (CHIRPS), pasut
   (EOT20 tide model), drainase (OSM). See
@@ -51,6 +52,10 @@ pip install marimo && marimo edit notebooks/explore.py
 and compares 3 train/val/test split configs against a persistence baseline
 (`python3 experiments/lstm_baseline.py`). Results: `reports/lstm_baseline/`,
 viewer: `marimo edit notebooks/02_lstm_baseline.py`.
+
+`experiments/lstm_multistation.py` repeats the baseline for all 14 Jakut
+stations on `forcing_hourly_multi` (split train Nov 2023–Dec 2024 / val
+Jan–Apr 2025 / test May 2025–Sep 2026). Results: `reports/lstm_multistation/`.
 
 ## Raw data
 

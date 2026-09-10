@@ -155,6 +155,56 @@ def train(X_tr, tide_tr, y_tr, X_va, tide_va, y_va, epochs=30, patience=5, lr=1e
     return model
 
 
+def fit_eval(win, tr_m, va_m, te_m, epochs, device):
+    """Train on tr_m, early-stop on va_m, score on te_m. Returns metrics dict + yhat."""
+    fmean = win["X"][tr_m].reshape(-1, 3).mean(axis=0)
+    fstd = win["X"][tr_m].reshape(-1, 3).std(axis=0) + 1e-8
+    ymean, ystd = win["y"][tr_m].mean(), win["y"][tr_m].std() + 1e-8
+
+    def norm_X(m):
+        return (win["X"][m] - fmean) / fstd
+
+    def norm_T(m):
+        return (win["tide_future"][m] - fmean[1]) / fstd[1]
+
+    try:
+        model = train(
+            norm_X(tr_m), norm_T(tr_m), (win["y"][tr_m] - ymean) / ystd,
+            norm_X(va_m), norm_T(va_m), (win["y"][va_m] - ymean) / ystd,
+            epochs=epochs, device=device,
+        )
+    except (RuntimeError, NotImplementedError):
+        device = "cpu"
+        model = train(
+            norm_X(tr_m), norm_T(tr_m), (win["y"][tr_m] - ymean) / ystd,
+            norm_X(va_m), norm_T(va_m), (win["y"][va_m] - ymean) / ystd,
+            epochs=epochs, device=device,
+        )
+
+    model.eval()
+    with torch.no_grad():
+        yhat_n = model(
+            torch.tensor(norm_X(te_m), dtype=torch.float32, device=device),
+            torch.tensor(norm_T(te_m), dtype=torch.float32, device=device),
+        ).cpu().numpy()
+    yhat = yhat_n * ystd + ymean
+    y_te, ylast_te, flag_te = win["y"][te_m], win["y_last"][te_m], win["qc_flag"][te_m]
+    f0 = flag_te == 0
+
+    lstm_all, lstm_f0 = metrics(y_te, yhat), metrics(y_te[f0], yhat[f0])
+    pers_all, pers_f0 = persistence_baseline(ylast_te, y_te), persistence_baseline(ylast_te[f0], y_te[f0])
+
+    res = dict(
+        n_train=int(tr_m.sum()), n_val=int(va_m.sum()), n_test=int(te_m.sum()), n_test_flag0=int(f0.sum()),
+        lstm_nse=lstm_all["nse"], lstm_rmse=lstm_all["rmse"], lstm_mae=lstm_all["mae"],
+        lstm_nse_flag0=lstm_f0["nse"], lstm_rmse_flag0=lstm_f0["rmse"], lstm_mae_flag0=lstm_f0["mae"],
+        persistence_nse=pers_all["nse"], persistence_rmse=pers_all["rmse"], persistence_mae=pers_all["mae"],
+        persistence_nse_flag0=pers_f0["nse"], persistence_rmse_flag0=pers_f0["rmse"], persistence_mae_flag0=pers_f0["mae"],
+        )
+    res["yhat"] = yhat
+    return res
+
+
 def run(quick: bool):
     device = "mps" if torch.backends.mps.is_available() else "cpu"
     # ponytail: MPS LSTM support is uneven across torch versions; fall back to
@@ -180,51 +230,10 @@ def run(quick: bool):
             if tr_m.sum() < 50 or va_m.sum() < 10 or te_m.sum() < 10:
                 continue
 
-            fmean = win["X"][tr_m].reshape(-1, 3).mean(axis=0)
-            fstd = win["X"][tr_m].reshape(-1, 3).std(axis=0) + 1e-8
-            ymean, ystd = win["y"][tr_m].mean(), win["y"][tr_m].std() + 1e-8
-
-            def norm_X(m):
-                return (win["X"][m] - fmean) / fstd
-
-            def norm_T(m):
-                return (win["tide_future"][m] - fmean[1]) / fstd[1]
-
-            try:
-                model = train(
-                    norm_X(tr_m), norm_T(tr_m), (win["y"][tr_m] - ymean) / ystd,
-                    norm_X(va_m), norm_T(va_m), (win["y"][va_m] - ymean) / ystd,
-                    epochs=epochs, device=device,
-                )
-            except (RuntimeError, NotImplementedError):
-                device = "cpu"
-                model = train(
-                    norm_X(tr_m), norm_T(tr_m), (win["y"][tr_m] - ymean) / ystd,
-                    norm_X(va_m), norm_T(va_m), (win["y"][va_m] - ymean) / ystd,
-                    epochs=epochs, device=device,
-                )
-
-            model.eval()
-            with torch.no_grad():
-                yhat_n = model(
-                    torch.tensor(norm_X(te_m), dtype=torch.float32, device=device),
-                    torch.tensor(norm_T(te_m), dtype=torch.float32, device=device),
-                ).cpu().numpy()
-            yhat = yhat_n * ystd + ymean
-            y_te, ylast_te, flag_te = win["y"][te_m], win["y_last"][te_m], win["qc_flag"][te_m]
-            f0 = flag_te == 0
-
-            lstm_all, lstm_f0 = metrics(y_te, yhat), metrics(y_te[f0], yhat[f0])
-            pers_all, pers_f0 = persistence_baseline(ylast_te, y_te), persistence_baseline(ylast_te[f0], y_te[f0])
-
-            rows.append(dict(
-                config=name, horizon=h,
-                n_train=int(tr_m.sum()), n_val=int(va_m.sum()), n_test=int(te_m.sum()), n_test_flag0=int(f0.sum()),
-                lstm_nse=lstm_all["nse"], lstm_rmse=lstm_all["rmse"], lstm_mae=lstm_all["mae"],
-                lstm_nse_flag0=lstm_f0["nse"], lstm_rmse_flag0=lstm_f0["rmse"], lstm_mae_flag0=lstm_f0["mae"],
-                persistence_nse=pers_all["nse"], persistence_rmse=pers_all["rmse"], persistence_mae=pers_all["mae"],
-                persistence_nse_flag0=pers_f0["nse"], persistence_rmse_flag0=pers_f0["rmse"], persistence_mae_flag0=pers_f0["mae"],
-            ))
+            res = fit_eval(win, tr_m, va_m, te_m, epochs, device)
+            yhat = res.pop("yhat")
+            y_te, flag_te = win["y"][te_m], win["qc_flag"][te_m]
+            rows.append(dict(config=name, horizon=h, **res))
 
             pred_df = pd.DataFrame(dict(waktu=wt[te_m], y=y_te, yhat=yhat, qc_flag=flag_te))
             pred_df.to_parquet(REPORT_DIR / f"pred_{name}_h{h}.parquet", index=False)

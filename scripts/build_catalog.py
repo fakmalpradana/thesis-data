@@ -11,6 +11,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import duckdb
+import yaml
 
 ROOT = Path(__file__).resolve().parent.parent  # data/
 DB_PATH = ROOT / "catalog.duckdb"
@@ -25,6 +26,8 @@ VIEWS = {
                         "TMA+hujan+pasut ter-align jam-an, node 140 (MVP)"),
     "tide_140": ("forcing-acquisition/data/processed/tide_140_2021_2026.parquet",
                  "Prediksi pasut EOT20, node 140, 2021-2026"),
+    "forcing_hourly_multi": ("forcing-acquisition/data/processed/forcing_hourly_multi.parquet",
+                             "TMA 14 stasiun Jakut + hujan + pasut (shared node-140 cell) jam-an"),
     "bpbd_banjir_2025_2026": ("validation/data/processed/data-kejadian-bencana-banjir.parquet",
                               "BPBD kejadian banjir per kelurahan/bulan, 2025Q1-2026Q1"),
     "bpbd_banjir_2024": ("validation/data/processed/data-kejadian-bencana-banjir-tahun-2024.parquet",
@@ -53,6 +56,8 @@ CATALOG_ROWS = [
      "poskobanjir.dsdadki.web.id (scraper)", "Respons scraper mentah per rentang tanggal, 14 stasiun"),
     ("forcing_hourly", "forcing-acquisition/data/processed/forcing_hourly.parquet", "parquet", "tabular", True,
      "harmonize.py (TMA+CHIRPS+EOT20)", "Forcing+label ter-align jam-an, node 140"),
+    ("forcing_hourly_multi", "forcing-acquisition/data/processed/forcing_hourly_multi.parquet", "parquet", "tabular", True,
+     "harmonize_multi.py", "Forcing+label jam-an, 14 stasiun Jakut, 369k baris"),
     ("tide_140", "forcing-acquisition/data/processed/tide_140_2021_2026.parquet", "parquet", "tabular", True,
      "pyTMD + EOT20", "Prediksi pasut node 140"),
     ("chirps_yearly", "forcing-acquisition/data/raw/chirps/_yearly/chirps-v2.0.{tahun}.days_p05.nc", "netcdf",
@@ -62,7 +67,7 @@ CATALOG_ROWS = [
     ("eot20_constituents", "forcing-acquisition/data/static/tide/EOT20/ocean_tides/{konstituen}_ocean_eot20.nc",
      "netcdf", "raster", False, "DGFI-TUM EOT20 (SEANOE DOI 10.17882/79489)",
      "17 konstituen pasut global, grid 1/8deg"),
-    ("demnas", "DEM/DEMNAS_merged_UTM.tif", "geotiff", "raster", False,
+    ("demnas", "forcing-acquisition/data/static/dem/demnas/DEMNAS_merged_UTM.tif", "geotiff", "raster", False,
      "BIG (user-supplied)", "DEMNAS merged, UTM"),
     ("dtm_dki_150cm", "forcing-acquisition/data/static/dem/jakarta/DTM_DKI_HYDRO_JALAN_1.5m.tif",
      "geotiff", "raster", False, "user-supplied", "DTM se-DKI Jakarta (hydro-enforced + jalan), 1.5m"),
@@ -87,6 +92,9 @@ CATALOG_ROWS = [
      "satudata.jakarta.go.id (DSDA DKI)", "614 rumah pompa DKI + lat/lon + kapasitas"),
     ("bpbd_titik_rawan", "validation/data/processed/data-titik-rawan-bencanabanjir.parquet", "parquet", "tabular", True,
      "satudata.jakarta.go.id (BPBD DKI)", "154 titik rawan banjir + lat/lon (koordinat tanpa desimal, bagi 1e6)"),
+    ("stations", "tinggi_air/config/stations.yaml", "yaml", "tabular", True,
+     "poskobanjir (id/nama/ambang siaga) + DSDA satudata (koordinat, by-name match)",
+     "39 stasiun TMA; 14 Jakut punya koordinat + ambang Siaga 1/2/3"),
     ("events", "validation/events.csv", "csv", "tabular", True,
      "hand-curated from tma_hourly + bpbd_banjir_* + petabencana_reports",
      "Kandidat kejadian banjir Jakut 2024-2026 untuk validasi (E1-E7), status candidate/confirmed"),
@@ -99,6 +107,16 @@ CATALOG_ROWS = [
 def main() -> None:
     con = duckdb.connect(str(DB_PATH))
 
+    # stations table from tinggi_air/config/stations.yaml (id, nama, koordinat DSDA, ambang siaga)
+    st = yaml.safe_load((ROOT / "tinggi_air/config/stations.yaml").read_text())["stations"]
+    con.execute("""CREATE OR REPLACE TABLE stations (
+        stasiun_id INTEGER, nama VARCHAR, lat DOUBLE, lon DOUBLE, koordinat_sumber VARCHAR,
+        siaga1_cm DOUBLE, siaga2_cm DOUBLE, siaga3_cm DOUBLE)""")
+    con.executemany("INSERT INTO stations VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [
+        (x["id"], x["nama"], (x.get("koordinat") or {}).get("lat"), (x.get("koordinat") or {}).get("lon"),
+         (x.get("koordinat") or {}).get("sumber"), x["ambang_siaga_cm"]["siaga1"], x["ambang_siaga_cm"]["siaga2"],
+         x["ambang_siaga_cm"]["siaga3"]) for x in st])
+    print(f"stations table: {len(st)} rows")
     con.execute(f"CREATE OR REPLACE VIEW events AS SELECT * FROM read_csv('{ROOT / 'validation/events.csv'}')")
     for name, (glob, desc) in VIEWS.items():
         con.execute(f"CREATE OR REPLACE VIEW {name} AS SELECT * FROM read_parquet('{ROOT / glob}')")

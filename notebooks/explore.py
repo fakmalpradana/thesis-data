@@ -33,19 +33,17 @@ def _():
 
 @app.cell
 def _(mo):
-    mo.md(
-        """
-        # Thesis data explorer — PINN-LSTM flood forecasting, Jakarta Utara
+    mo.md("""
+    # Thesis data explorer — PINN-LSTM flood forecasting, Jakarta Utara
 
-        Every dataset registered in `catalog.duckdb`, one section each. Each section opens with
-        an **overview** (what it is, where it comes from, APA 7 citation, brief analysis) followed
-        by an **interactive view**. Raw data lives outside git; the catalog records its provenance.
+    Every dataset registered in `catalog.duckdb`, one section each. Each section opens with
+    an **overview** (what it is, where it comes from, APA 7 citation, brief analysis) followed
+    by an **interactive view**. Raw data lives outside git; the catalog records its provenance.
 
-        Study target: water level (TMA, *tinggi muka air*) at DKI Jakarta floodgates/pumps, with
-        rainfall (CHIRPS) and astronomical tide (EOT20) as physical forcings. MVP node = station
-        140, P.A. Marina Ancol (Laut), the only station with a continuous 2021–2026 record.
-        """
-    )
+    Study target: water level (TMA, *tinggi muka air*) at DKI Jakarta floodgates/pumps, with
+    rainfall (CHIRPS) and astronomical tide (EOT20) as physical forcings. MVP node = station
+    140, P.A. Marina Ancol (Laut), the only station with a continuous 2021–2026 record.
+    """)
     return
 
 
@@ -221,7 +219,7 @@ def _(chirps, day, plt):
 
 
 @app.cell
-def _(con, mo, plt):
+def _(con, mo):
     tide = con.sql("SELECT * FROM tide_140 ORDER BY 1").df()
     _t = tide.iloc[:, 1]
     mo.vstack(

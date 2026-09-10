@@ -68,9 +68,9 @@ stations:
 - id: 162
   nama: Pompa Pasar Ikan 1
   ambang_siaga_cm:
-    siaga1: null
-    siaga2: null
-    siaga3: null
+    siaga1: 250.0
+    siaga2: 200.0
+    siaga3: 170.0
 - id: 167
   nama: Rumah Pompa Pluit 1
   ambang_siaga_cm:
@@ -92,15 +92,15 @@ stations:
 - id: 150
   nama: P.S. Sunter Hulu
   ambang_siaga_cm:
-    siaga1: null
-    siaga2: null
-    siaga3: null
+    siaga1: 250.0
+    siaga2: 200.0
+    siaga3: 140.0
 - id: 126
   nama: P.A. Pulo Gadung 2
   ambang_siaga_cm:
-    siaga1: null
-    siaga2: null
-    siaga3: null
+    siaga1: 770.0
+    siaga2: 700.0
+    siaga3: 550.0
 - id: 164
   nama: Pompa Yos Sudarso 1
   ambang_siaga_cm:
