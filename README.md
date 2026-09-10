@@ -39,6 +39,13 @@ pip install marimo && marimo edit notebooks/explore.py
   boundaries): query `SELECT * FROM catalog WHERE layer_kind IN ('raster',
   'vector')` for paths, then open those paths directly in QGIS.
 
+## Experiments
+
+`experiments/lstm_baseline.py` trains an LSTM baseline for TMA at station 140
+and compares 3 train/val/test split configs against a persistence baseline
+(`python3 experiments/lstm_baseline.py`). Results: `reports/lstm_baseline/`,
+viewer: `marimo edit notebooks/02_lstm_baseline.py`.
+
 ## Raw data
 
 Not tracked in git (see `.gitignore` in each pipeline + repo root) — either
