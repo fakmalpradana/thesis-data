@@ -1,7 +1,10 @@
 """LSTM baseline per Jakut station (split B_clean, horizons 1/6/12/24) reusing
 experiments/lstm_baseline.py. Answers RQ3 lead time per station.
 
-    python3 experiments/lstm_multistation.py [--quick]
+    python3 experiments/lstm_multistation.py [--quick] [--station ID]
+
+--station ID: run only that station and merge its rows into the existing
+metrics.json/csv (other stations' rows are kept as-is).
 
 Output: reports/lstm_multistation/metrics.json + metrics.csv
 """
@@ -27,11 +30,18 @@ OUT = ROOT / "reports/lstm_multistation"
 # ponytail: point-QC thresholds were tuned on station 140; re-tune per station
 # type (bubble vs pressure) before trusting flag-8 as "bad" elsewhere.
 SPLIT = (("2023-11-01", "2024-12-31"), ("2025-01-01", "2025-04-30"), ("2025-05-01", "2026-12-31"), True)
+# 126's raw scrape has a gap 2024-11-15..2025-11-01 (source outage), which
+# swallows the shared val window whole (0 val windows -> skipped, NaN in
+# metrics.csv). Val/test shifted forward to land after the gap; train
+# unchanged (unaffected - ends before the gap starts).
+SPLIT_OVERRIDES = {
+    126: (("2023-11-01", "2024-12-31"), ("2025-11-01", "2025-12-31"), ("2026-01-01", "2026-12-31"), True),
+}
 
 
-def run_station(df: pd.DataFrame, horizons, epochs, device) -> list[dict]:
+def run_station(df: pd.DataFrame, horizons, epochs, device, sid: int) -> list[dict]:
     rows = []
-    train_r, val_r, test_r, keep_flags = SPLIT
+    train_r, val_r, test_r, keep_flags = SPLIT_OVERRIDES.get(sid, SPLIT)
     df = lb.prepare(df)
     for h in horizons:
         win = lb.make_windows(df, horizon=h)
@@ -51,11 +61,14 @@ def run_station(df: pd.DataFrame, horizons, epochs, device) -> list[dict]:
     return rows
 
 
-def main(quick: bool) -> None:
+def main(quick: bool, only_station: int | None) -> None:
     device = "mps" if torch.backends.mps.is_available() else "cpu"
     horizons, epochs = ([1, 24], 2) if quick else ([1, 6, 12, 24], 30)
     multi = pd.read_parquet(ROOT / "forcing-acquisition/data/processed/forcing_hourly_multi.parquet")
     multi["waktu"] = pd.to_datetime(multi["waktu"], utc=True).dt.tz_convert(None)
+    multi["stasiun_id"] = multi["stasiun_id"].astype(int)
+    if only_station is not None:
+        multi = multi[multi["stasiun_id"] == only_station]
     OUT.mkdir(parents=True, exist_ok=True)
     results = []
     t0 = time.time()
@@ -63,9 +76,16 @@ def main(quick: bool) -> None:
         name = g["stasiun_nama"].iloc[0]
         gdf = g.drop(columns=["stasiun_id", "stasiun_nama"]).reset_index(drop=True)
         gdf.attrs["sid"] = sid
-        for r in run_station(gdf, horizons, epochs, device):
+        for r in run_station(gdf, horizons, epochs, device, sid):
             results.append({"stasiun_id": sid, "stasiun_nama": name, **r})
         print(f"{sid} {name}: done ({time.time() - t0:.0f}s)")
+
+    if only_station is not None and (OUT / "metrics.json").exists():
+        prior = json.loads((OUT / "metrics.json").read_text())
+        results = [r for r in prior if int(r["stasiun_id"]) != only_station] + results
+    for r in results:
+        r["stasiun_id"] = int(r["stasiun_id"])
+
     (OUT / "metrics.json").write_text(json.dumps(results, indent=1, default=float))
     m = pd.DataFrame(results)
     m.to_csv(OUT / "metrics.csv", index=False)
@@ -73,4 +93,7 @@ def main(quick: bool) -> None:
 
 
 if __name__ == "__main__":
-    main("--quick" in sys.argv)
+    station_arg = None
+    if "--station" in sys.argv:
+        station_arg = int(sys.argv[sys.argv.index("--station") + 1])
+    main("--quick" in sys.argv, station_arg)

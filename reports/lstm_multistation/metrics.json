@@ -1,6 +1,6 @@
 [
  {
-  "stasiun_id": "107",
+  "stasiun_id": 107,
   "stasiun_nama": "P.A. Cengkareng Drain",
   "horizon": 1,
   "n_train": 9902,
@@ -21,7 +21,7 @@
   "persistence_mae_flag0": 5.54397592675612
  },
  {
-  "stasiun_id": "107",
+  "stasiun_id": 107,
   "stasiun_nama": "P.A. Cengkareng Drain",
   "horizon": 6,
   "n_train": 9887,
@@ -42,7 +42,7 @@
   "persistence_mae_flag0": 27.43721133880633
  },
  {
-  "stasiun_id": "107",
+  "stasiun_id": 107,
   "stasiun_nama": "P.A. Cengkareng Drain",
   "horizon": 12,
   "n_train": 9874,
@@ -63,7 +63,7 @@
   "persistence_mae_flag0": 36.67247342468062
  },
  {
-  "stasiun_id": "107",
+  "stasiun_id": 107,
   "stasiun_nama": "P.A. Cengkareng Drain",
   "horizon": 24,
   "n_train": 9850,
@@ -84,43 +84,7 @@
   "persistence_mae_flag0": 12.673644832027263
  },
  {
-  "stasiun_id": "126",
-  "stasiun_nama": "P.A. Pulo Gadung 2",
-  "horizon": 1,
-  "n_train": 8503,
-  "n_val": 0,
-  "n_test": 7129,
-  "note": "too few windows (126: no data Jan-Sep 2025 = val period)"
- },
- {
-  "stasiun_id": "126",
-  "stasiun_nama": "P.A. Pulo Gadung 2",
-  "horizon": 6,
-  "n_train": 8491,
-  "n_val": 0,
-  "n_test": 7114,
-  "note": "too few windows (126: no data Jan-Sep 2025 = val period)"
- },
- {
-  "stasiun_id": "126",
-  "stasiun_nama": "P.A. Pulo Gadung 2",
-  "horizon": 12,
-  "n_train": 8479,
-  "n_val": 0,
-  "n_test": 7096,
-  "note": "too few windows (126: no data Jan-Sep 2025 = val period)"
- },
- {
-  "stasiun_id": "126",
-  "stasiun_nama": "P.A. Pulo Gadung 2",
-  "horizon": 24,
-  "n_train": 8455,
-  "n_val": 0,
-  "n_test": 7068,
-  "note": "too few windows (126: no data Jan-Sep 2025 = val period)"
- },
- {
-  "stasiun_id": "140",
+  "stasiun_id": 140,
   "stasiun_nama": "P.A. Marina Ancol (Laut)",
   "horizon": 1,
   "n_train": 10137,
@@ -141,7 +105,7 @@
   "persistence_mae_flag0": 6.157640006128859
  },
  {
-  "stasiun_id": "140",
+  "stasiun_id": 140,
   "stasiun_nama": "P.A. Marina Ancol (Laut)",
   "horizon": 6,
   "n_train": 10132,
@@ -162,7 +126,7 @@
   "persistence_mae_flag0": 29.88744202981871
  },
  {
-  "stasiun_id": "140",
+  "stasiun_id": 140,
   "stasiun_nama": "P.A. Marina Ancol (Laut)",
   "horizon": 12,
   "n_train": 10126,
@@ -183,7 +147,7 @@
   "persistence_mae_flag0": 39.948435071493414
  },
  {
-  "stasiun_id": "140",
+  "stasiun_id": 140,
   "stasiun_nama": "P.A. Marina Ancol (Laut)",
   "horizon": 24,
   "n_train": 10122,
@@ -204,7 +168,7 @@
   "persistence_mae_flag0": 7.9473560822178335
  },
  {
-  "stasiun_id": "150",
+  "stasiun_id": 150,
   "stasiun_nama": "P.S. Sunter Hulu",
   "horizon": 1,
   "n_train": 10225,
@@ -225,7 +189,7 @@
   "persistence_mae_flag0": 2.981883751498163
  },
  {
-  "stasiun_id": "150",
+  "stasiun_id": 150,
   "stasiun_nama": "P.S. Sunter Hulu",
   "horizon": 6,
   "n_train": 10225,
@@ -246,7 +210,7 @@
   "persistence_mae_flag0": 10.978681526626938
  },
  {
-  "stasiun_id": "150",
+  "stasiun_id": 150,
   "stasiun_nama": "P.S. Sunter Hulu",
   "horizon": 12,
   "n_train": 10225,
@@ -267,7 +231,7 @@
   "persistence_mae_flag0": 14.829832871101154
  },
  {
-  "stasiun_id": "150",
+  "stasiun_id": 150,
   "stasiun_nama": "P.S. Sunter Hulu",
   "horizon": 24,
   "n_train": 10225,
@@ -288,7 +252,7 @@
   "persistence_mae_flag0": 16.78940499647728
  },
  {
-  "stasiun_id": "162",
+  "stasiun_id": 162,
   "stasiun_nama": "Pompa Pasar Ikan 1",
   "horizon": 1,
   "n_train": 9236,
@@ -309,7 +273,7 @@
   "persistence_mae_flag0": 6.273068457104049
  },
  {
-  "stasiun_id": "162",
+  "stasiun_id": 162,
   "stasiun_nama": "Pompa Pasar Ikan 1",
   "horizon": 6,
   "n_train": 9217,
@@ -330,7 +294,7 @@
   "persistence_mae_flag0": 30.9287719070271
  },
  {
-  "stasiun_id": "162",
+  "stasiun_id": 162,
   "stasiun_nama": "Pompa Pasar Ikan 1",
   "horizon": 12,
   "n_train": 9202,
@@ -351,7 +315,7 @@
   "persistence_mae_flag0": 41.41568284271742
  },
  {
-  "stasiun_id": "162",
+  "stasiun_id": 162,
   "stasiun_nama": "Pompa Pasar Ikan 1",
   "horizon": 24,
   "n_train": 9178,
@@ -372,7 +336,7 @@
   "persistence_mae_flag0": 7.299803419596936
  },
  {
-  "stasiun_id": "164",
+  "stasiun_id": 164,
   "stasiun_nama": "Pompa Yos Sudarso 1",
   "horizon": 1,
   "n_train": 9184,
@@ -393,7 +357,7 @@
   "persistence_mae_flag0": 15.273825389489414
  },
  {
-  "stasiun_id": "164",
+  "stasiun_id": 164,
   "stasiun_nama": "Pompa Yos Sudarso 1",
   "horizon": 6,
   "n_train": 9164,
@@ -414,7 +378,7 @@
   "persistence_mae_flag0": 42.41350638910928
  },
  {
-  "stasiun_id": "164",
+  "stasiun_id": 164,
   "stasiun_nama": "Pompa Yos Sudarso 1",
   "horizon": 12,
   "n_train": 9146,
@@ -435,7 +399,7 @@
   "persistence_mae_flag0": 45.00092815095047
  },
  {
-  "stasiun_id": "164",
+  "stasiun_id": 164,
   "stasiun_nama": "Pompa Yos Sudarso 1",
   "horizon": 24,
   "n_train": 9110,
@@ -456,7 +420,7 @@
   "persistence_mae_flag0": 40.916545496646904
  },
  {
-  "stasiun_id": "166",
+  "stasiun_id": 166,
   "stasiun_nama": "P.A. Marina Ancol (Kali)",
   "horizon": 1,
   "n_train": 9316,
@@ -477,7 +441,7 @@
   "persistence_mae_flag0": 3.0690093124449302
  },
  {
-  "stasiun_id": "166",
+  "stasiun_id": 166,
   "stasiun_nama": "P.A. Marina Ancol (Kali)",
   "horizon": 6,
   "n_train": 9301,
@@ -498,7 +462,7 @@
   "persistence_mae_flag0": 11.065167408926603
  },
  {
-  "stasiun_id": "166",
+  "stasiun_id": 166,
   "stasiun_nama": "P.A. Marina Ancol (Kali)",
   "horizon": 12,
   "n_train": 9289,
@@ -519,7 +483,7 @@
   "persistence_mae_flag0": 14.014340152961948
  },
  {
-  "stasiun_id": "166",
+  "stasiun_id": 166,
   "stasiun_nama": "P.A. Marina Ancol (Kali)",
   "horizon": 24,
   "n_train": 9265,
@@ -540,7 +504,7 @@
   "persistence_mae_flag0": 9.7894618867811
  },
  {
-  "stasiun_id": "167",
+  "stasiun_id": 167,
   "stasiun_nama": "Rumah Pompa Pluit 1",
   "horizon": 1,
   "n_train": 9203,
@@ -561,7 +525,7 @@
   "persistence_mae_flag0": 1.989788032404518
  },
  {
-  "stasiun_id": "167",
+  "stasiun_id": 167,
   "stasiun_nama": "Rumah Pompa Pluit 1",
   "horizon": 6,
   "n_train": 9188,
@@ -582,7 +546,7 @@
   "persistence_mae_flag0": 8.946367256694595
  },
  {
-  "stasiun_id": "167",
+  "stasiun_id": 167,
   "stasiun_nama": "Rumah Pompa Pluit 1",
   "horizon": 12,
   "n_train": 9176,
@@ -603,7 +567,7 @@
   "persistence_mae_flag0": 11.762451231895678
  },
  {
-  "stasiun_id": "167",
+  "stasiun_id": 167,
   "stasiun_nama": "Rumah Pompa Pluit 1",
   "horizon": 24,
   "n_train": 9152,
@@ -624,7 +588,7 @@
   "persistence_mae_flag0": 9.1143252736276
  },
  {
-  "stasiun_id": "169",
+  "stasiun_id": 169,
   "stasiun_nama": "P.A. Kaliduri 1",
   "horizon": 1,
   "n_train": 9114,
@@ -645,7 +609,7 @@
   "persistence_mae_flag0": 2.407054462754274
  },
  {
-  "stasiun_id": "169",
+  "stasiun_id": 169,
   "stasiun_nama": "P.A. Kaliduri 1",
   "horizon": 6,
   "n_train": 9094,
@@ -666,7 +630,7 @@
   "persistence_mae_flag0": 7.8358576917360825
  },
  {
-  "stasiun_id": "169",
+  "stasiun_id": 169,
   "stasiun_nama": "P.A. Kaliduri 1",
   "horizon": 12,
   "n_train": 9076,
@@ -687,7 +651,7 @@
   "persistence_mae_flag0": 8.141653287208081
  },
  {
-  "stasiun_id": "169",
+  "stasiun_id": 169,
   "stasiun_nama": "P.A. Kaliduri 1",
   "horizon": 24,
   "n_train": 9040,
@@ -708,7 +672,7 @@
   "persistence_mae_flag0": 5.845383912366136
  },
  {
-  "stasiun_id": "170",
+  "stasiun_id": 170,
   "stasiun_nama": "P.A. Ancol Flushing 1",
   "horizon": 1,
   "n_train": 9316,
@@ -729,7 +693,7 @@
   "persistence_mae_flag0": 3.1826897583877622
  },
  {
-  "stasiun_id": "170",
+  "stasiun_id": 170,
   "stasiun_nama": "P.A. Ancol Flushing 1",
   "horizon": 6,
   "n_train": 9301,
@@ -750,7 +714,7 @@
   "persistence_mae_flag0": 12.515441848795664
  },
  {
-  "stasiun_id": "170",
+  "stasiun_id": 170,
   "stasiun_nama": "P.A. Ancol Flushing 1",
   "horizon": 12,
   "n_train": 9289,
@@ -771,7 +735,7 @@
   "persistence_mae_flag0": 15.66902186663171
  },
  {
-  "stasiun_id": "170",
+  "stasiun_id": 170,
   "stasiun_nama": "P.A. Ancol Flushing 1",
   "horizon": 24,
   "n_train": 9265,
@@ -792,7 +756,7 @@
   "persistence_mae_flag0": 10.068466927243335
  },
  {
-  "stasiun_id": "179",
+  "stasiun_id": 179,
   "stasiun_nama": "Pompa Kamal Muara (Bubble)",
   "horizon": 1,
   "n_train": 7633,
@@ -813,7 +777,7 @@
   "persistence_mae_flag0": 8.40640162966693
  },
  {
-  "stasiun_id": "179",
+  "stasiun_id": 179,
   "stasiun_nama": "Pompa Kamal Muara (Bubble)",
   "horizon": 6,
   "n_train": 7594,
@@ -834,7 +798,7 @@
   "persistence_mae_flag0": 35.298699798948476
  },
  {
-  "stasiun_id": "179",
+  "stasiun_id": 179,
   "stasiun_nama": "Pompa Kamal Muara (Bubble)",
   "horizon": 12,
   "n_train": 7563,
@@ -855,7 +819,7 @@
   "persistence_mae_flag0": 47.08722234430947
  },
  {
-  "stasiun_id": "179",
+  "stasiun_id": 179,
   "stasiun_nama": "Pompa Kamal Muara (Bubble)",
   "horizon": 24,
   "n_train": 7515,
@@ -876,7 +840,7 @@
   "persistence_mae_flag0": 10.465887620339041
  },
  {
-  "stasiun_id": "181",
+  "stasiun_id": 181,
   "stasiun_nama": "Pompa Kali Asin (Bubble)",
   "horizon": 1,
   "n_train": 8953,
@@ -897,7 +861,7 @@
   "persistence_mae_flag0": 17.150689999091085
  },
  {
-  "stasiun_id": "181",
+  "stasiun_id": 181,
   "stasiun_nama": "Pompa Kali Asin (Bubble)",
   "horizon": 6,
   "n_train": 8937,
@@ -918,7 +882,7 @@
   "persistence_mae_flag0": 42.27121038381908
  },
  {
-  "stasiun_id": "181",
+  "stasiun_id": 181,
   "stasiun_nama": "Pompa Kali Asin (Bubble)",
   "horizon": 12,
   "n_train": 8919,
@@ -939,7 +903,7 @@
   "persistence_mae_flag0": 49.82428014886416
  },
  {
-  "stasiun_id": "181",
+  "stasiun_id": 181,
   "stasiun_nama": "Pompa Kali Asin (Bubble)",
   "horizon": 24,
   "n_train": 8883,
@@ -960,7 +924,7 @@
   "persistence_mae_flag0": 23.768209025051394
  },
  {
-  "stasiun_id": "184",
+  "stasiun_id": 184,
   "stasiun_nama": "Pompa Lagoa (Bubble)",
   "horizon": 1,
   "n_train": 8678,
@@ -981,7 +945,7 @@
   "persistence_mae_flag0": 7.790306494972642
  },
  {
-  "stasiun_id": "184",
+  "stasiun_id": 184,
   "stasiun_nama": "Pompa Lagoa (Bubble)",
   "horizon": 6,
   "n_train": 8650,
@@ -1002,7 +966,7 @@
   "persistence_mae_flag0": 32.218164446288334
  },
  {
-  "stasiun_id": "184",
+  "stasiun_id": 184,
   "stasiun_nama": "Pompa Lagoa (Bubble)",
   "horizon": 12,
   "n_train": 8632,
@@ -1023,7 +987,7 @@
   "persistence_mae_flag0": 40.30195387256381
  },
  {
-  "stasiun_id": "184",
+  "stasiun_id": 184,
   "stasiun_nama": "Pompa Lagoa (Bubble)",
   "horizon": 24,
   "n_train": 8596,
@@ -1044,7 +1008,7 @@
   "persistence_mae_flag0": 9.475119736712315
  },
  {
-  "stasiun_id": "187",
+  "stasiun_id": 187,
   "stasiun_nama": "Pompa Cilincing (Bubble)",
   "horizon": 1,
   "n_train": 8359,
@@ -1065,7 +1029,7 @@
   "persistence_mae_flag0": 6.438137021349733
  },
  {
-  "stasiun_id": "187",
+  "stasiun_id": 187,
   "stasiun_nama": "Pompa Cilincing (Bubble)",
   "horizon": 6,
   "n_train": 8316,
@@ -1086,7 +1050,7 @@
   "persistence_mae_flag0": 31.151184657043792
  },
  {
-  "stasiun_id": "187",
+  "stasiun_id": 187,
   "stasiun_nama": "Pompa Cilincing (Bubble)",
   "horizon": 12,
   "n_train": 8282,
@@ -1107,7 +1071,7 @@
   "persistence_mae_flag0": 41.876149732059496
  },
  {
-  "stasiun_id": "187",
+  "stasiun_id": 187,
   "stasiun_nama": "Pompa Cilincing (Bubble)",
   "horizon": 24,
   "n_train": 8240,
@@ -1126,5 +1090,89 @@
   "persistence_nse_flag0": 0.9562171352186599,
   "persistence_rmse_flag0": 13.577859954084133,
   "persistence_mae_flag0": 8.139769401984111
+ },
+ {
+  "stasiun_id": 126,
+  "stasiun_nama": "P.A. Pulo Gadung 2",
+  "horizon": 1,
+  "n_train": 8503,
+  "n_val": 1343,
+  "n_test": 5761,
+  "n_test_flag0": 5683,
+  "lstm_nse": 0.2008645365868802,
+  "lstm_rmse": 23.27492510735768,
+  "lstm_mae": 13.78526100124443,
+  "lstm_nse_flag0": 0.20144733974871265,
+  "lstm_rmse_flag0": 21.856822921602852,
+  "lstm_mae_flag0": 13.380876156171544,
+  "persistence_nse": 0.8564176058104064,
+  "persistence_rmse": 9.865717730908068,
+  "persistence_mae": 4.161762590820047,
+  "persistence_nse_flag0": 0.8573920244790154,
+  "persistence_rmse_flag0": 9.236494174385857,
+  "persistence_mae_flag0": 4.050684302109605
+ },
+ {
+  "stasiun_id": 126,
+  "stasiun_nama": "P.A. Pulo Gadung 2",
+  "horizon": 6,
+  "n_train": 8491,
+  "n_val": 1338,
+  "n_test": 5751,
+  "n_test_flag0": 5673,
+  "lstm_nse": 0.0013352464223770344,
+  "lstm_rmse": 26.03861540569031,
+  "lstm_mae": 14.180513488670568,
+  "lstm_nse_flag0": 0.006302819102703694,
+  "lstm_rmse_flag0": 24.40030577939435,
+  "lstm_mae_flag0": 13.74084134404267,
+  "persistence_nse": -0.0226297606782202,
+  "persistence_rmse": 26.34918820957979,
+  "persistence_mae": 12.759532641666182,
+  "persistence_nse_flag0": -0.05932067968681598,
+  "persistence_rmse_flag0": 25.193120576585212,
+  "persistence_mae_flag0": 12.382925945511879
+ },
+ {
+  "stasiun_id": 126,
+  "stasiun_nama": "P.A. Pulo Gadung 2",
+  "horizon": 12,
+  "n_train": 8479,
+  "n_val": 1332,
+  "n_test": 5739,
+  "n_test_flag0": 5661,
+  "lstm_nse": -0.07488736276879893,
+  "lstm_rmse": 27.03955728268683,
+  "lstm_mae": 15.454339620294459,
+  "lstm_nse_flag0": -0.08713042866271259,
+  "lstm_rmse_flag0": 25.546020810085952,
+  "lstm_mae_flag0": 15.032056299659624,
+  "persistence_nse": -0.4319167913377193,
+  "persistence_rmse": 31.208794180078883,
+  "persistence_mae": 14.633093260537066,
+  "persistence_nse_flag0": -0.48431530059102146,
+  "persistence_rmse_flag0": 29.85008126912001,
+  "persistence_mae_flag0": 14.1905214037567
+ },
+ {
+  "stasiun_id": 126,
+  "stasiun_nama": "P.A. Pulo Gadung 2",
+  "horizon": 24,
+  "n_train": 8455,
+  "n_val": 1320,
+  "n_test": 5723,
+  "n_test_flag0": 5637,
+  "lstm_nse": -0.31153921911832927,
+  "lstm_rmse": 29.905393539201317,
+  "lstm_mae": 19.490186584631655,
+  "lstm_nse_flag0": -0.35730972484261114,
+  "lstm_rmse_flag0": 28.593837700468228,
+  "lstm_mae_flag0": 19.07216451697903,
+  "persistence_nse": -0.5926899278204691,
+  "persistence_rmse": 32.955241437408326,
+  "persistence_mae": 13.333140017029585,
+  "persistence_nse_flag0": -0.686746943294551,
+  "persistence_rmse_flag0": 31.87556807211177,
+  "persistence_mae_flag0": 12.931727376658191
  }
 ]

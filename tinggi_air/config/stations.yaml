@@ -59,24 +59,40 @@ stations:
     siaga1: 250.0
     siaga2: 200.0
     siaga3: 170.0
+  koordinat:
+    lat: -6.126688
+    lon: 106.829601
+    sumber: DSDA satudata dsda_pintu_air (by-name, score 0.67)
 - id: 166
   nama: P.A. Marina Ancol (Kali)
   ambang_siaga_cm:
     siaga1: 250.0
     siaga2: 200.0
     siaga3: 170.0
+  koordinat:
+    lat: -6.126688
+    lon: 106.829601
+    sumber: DSDA satudata dsda_pintu_air (by-name, score 0.67)
 - id: 162
   nama: Pompa Pasar Ikan 1
   ambang_siaga_cm:
     siaga1: 250.0
     siaga2: 200.0
     siaga3: 170.0
+  koordinat:
+    lat: -6.12669
+    lon: 106.809655
+    sumber: DSDA satudata dsda_pintu_air (by-name, score 1.00)
 - id: 167
   nama: Rumah Pompa Pluit 1
   ambang_siaga_cm:
     siaga1: 45.0
     siaga2: 0.0
     siaga3: -50.0
+  koordinat:
+    lat: -6.109076
+    lon: 106.796649
+    sumber: DSDA satudata dsda_rumah_pompa (by-name, score 0.62)
 - id: 160
   nama: P.S. Pesanggrahan 1
   ambang_siaga_cm:
@@ -95,24 +111,40 @@ stations:
     siaga1: 250.0
     siaga2: 200.0
     siaga3: 140.0
+  koordinat:
+    lat: -6.317916
+    lon: 106.920893
+    sumber: DSDA satudata dsda_pintu_air (by-name, score 1.00)
 - id: 126
   nama: P.A. Pulo Gadung 2
   ambang_siaga_cm:
     siaga1: 770.0
     siaga2: 700.0
     siaga3: 550.0
+  koordinat:
+    lat: -6.109
+    lon: 106.906417
+    sumber: DSDA satudata dsda_pintu_air (by-name, score 1.00)
 - id: 164
   nama: Pompa Yos Sudarso 1
   ambang_siaga_cm:
     siaga1: 250.0
     siaga2: 200.0
     siaga3: 140.0
+  koordinat:
+    lat: -6.154806
+    lon: 106.886339
+    sumber: DSDA satudata dsda_rumah_pompa (by-name, score 1.00)
 - id: 169
   nama: P.A. Kaliduri 1
   ambang_siaga_cm:
     siaga1: 320.0
     siaga2: 270.0
     siaga3: 220.0
+  koordinat:
+    lat: -6.142385
+    lon: 106.789838
+    sumber: DSDA satudata dsda_rumah_pompa (by-name, score 0.94)
 - id: 172
   nama: P.A. Istiqlal 1
   ambang_siaga_cm:
@@ -137,30 +169,50 @@ stations:
     siaga1: 310.0
     siaga2: 270.0
     siaga3: 190.0
+  koordinat:
+    lat: -6.154056
+    lon: 106.747768
+    sumber: DSDA satudata dsda_pintu_air (by-name, score 1.00)
 - id: 179
   nama: Pompa Kamal Muara (Bubble)
   ambang_siaga_cm:
     siaga1: 300.0
     siaga2: 250.0
     siaga3: 200.0
+  koordinat:
+    lat: -6.093938
+    lon: 106.721842
+    sumber: DSDA satudata dsda_rumah_pompa (by-name, score 1.00)
 - id: 181
   nama: Pompa Kali Asin (Bubble)
   ambang_siaga_cm:
     siaga1: 300.0
     siaga2: 250.0
     siaga3: 200.0
+  koordinat:
+    lat: -6.11066
+    lon: 106.77424
+    sumber: DSDA satudata dsda_rumah_pompa (by-name, score 1.00)
 - id: 184
   nama: Pompa Lagoa (Bubble)
   ambang_siaga_cm:
     siaga1: 300.0
     siaga2: 250.0
     siaga3: 200.0
+  koordinat:
+    lat: -6.11084
+    lon: 106.906962
+    sumber: DSDA satudata dsda_rumah_pompa (by-name, score 1.00)
 - id: 187
   nama: Pompa Cilincing (Bubble)
   ambang_siaga_cm:
     siaga1: 300.0
     siaga2: 250.0
     siaga3: 200.0
+  koordinat:
+    lat: -6.100933
+    lon: 106.940343
+    sumber: DSDA satudata dsda_rumah_pompa (by-name, score 1.00)
 - id: 189
   nama: Jembatan Pasir Jambu
   ambang_siaga_cm:
