@@ -63,6 +63,12 @@ PetaBencana ground truth. `notebooks/03_xcorr_events.py` cross-correlates
 TMA with tide/rain and classifies each event pluvial/tidal/compound.
 Results: `reports/siaga_f1/`, `reports/xcorr/`.
 
+`scripts/dtm_grid.py` builds the 10 m PINN grid (elevation, slope, D8 flow,
+sink depth) from the 1.5 m DTM; `scripts/canal_graph.py` builds the OSM canal
+graph with the 14 stations snapped (`reference/jakarta/canal_graph.gpkg`).
+`validation/src/sar_flood_extent.py` derives Sentinel-1 flood masks per event
+(see the caveat in the `catalog` row `sar_flood_extent`).
+
 `experiments/anomaly_f1.py` re-scores LSTM vs persistence with per-station,
 datum-free event definitions (train p95, and rise-over-24h-median) instead of
 the absolute Siaga-3 cm threshold. `experiments/lstm_peakloss.py` retrains

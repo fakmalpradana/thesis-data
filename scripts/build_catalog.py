@@ -82,6 +82,22 @@ CATALOG_ROWS = [
      "DTM se-DKI Jakarta (hydro-enforced + jalan), 1.5m. Vertikal: ORTOMETRIK (geoid belum dikonfirmasi; "
      "konsisten dengan DEMNAS EGM2008 +/-1 m, pantai 0.3-1 m). Klaim 'elipsoid WGS 84' dari DCKTRP tidak "
      "sesuai isi raster - selisih thd DEMNAS ~0 m, bukan ~18 m. Cek 2026-09-12, scripts/check_dtm_datum.py"),
+    ("dtm_grid10m", "forcing-acquisition/data/static/dem/jakarta/grid10m/{dtm_10m,slope_deg,aspect,fdir,facc,sinks}.tif",
+     "geotiff", "raster", False, "derived: dtm_dki_150cm via scripts/dtm_grid.py (gdalwarp 10m avg, gdaldem, pysheds D8)",
+     "Grid PINN 10 m bbox Jakut: elevasi, slope, aspect, D8 flowdir/accum, kedalaman sink (total 66 jt m3)"),
+    ("canal_graph", "reference/jakarta/canal_graph.gpkg", "gpkg", "vector", True,
+     "OSM drainage via scripts/canal_graph.py (networkx)",
+     "Graf kanal/drainase 68.7k node; 14 stasiun ter-snap <=300 m; 13 satu komponen ke muara, 164 terisolasi"),
+    ("station_graph_distance", "reference/jakarta/station_graph_distance.csv", "csv", "tabular", True,
+     "derived: canal_graph", "Jarak jalur terpendek (km) antar stasiun dalam satu komponen graf"),
+    ("sar_flood_extent", "validation/data/processed/sar/sar_scenes.csv", "csv", "tabular", True,
+     "validation/src/sar_flood_extent.py (Sentinel-1 RTC via Planetary Computer, VV < -16 dB minus referensi kering)",
+     "Metadata scene + luas genangan E2/E6/E7. CAVEAT 12 Sep: poligon terbesar = Teluk Jakarta (laut belum dimasker), "
+     "0 % laporan PetaBencana di dalam poligon, scene 1-4.5 hari setelah puncak -> BELUM VALID untuk IoU"),
+    ("sar_flood_raster", "validation/data/processed/sar/flood_{event}.tif", "geotiff", "raster", False,
+     "sar_flood_extent.py", "Mask genangan biner per event (uint8), UTM 48S - lihat caveat sar_flood_extent"),
+    ("sar_flood_polygons", "validation/data/processed/sar/flood_{event}.geojson", "geojson", "vector", False,
+     "sar_flood_extent.py", "Poligon genangan per event, EPSG:4326 - lihat caveat sar_flood_extent"),
     ("osm_drainage", "forcing-acquisition/data/raw/osm_drainage/osm_drainage_106.6_-6.5_107.1_-6.0.json",
      "geojson", "vector", False, "OSM Overpass API", "Drainase/kanal, 4110 elemen"),
     ("batas_kota_dki", "reference/batas_adm/Batas Kota DKI.geojson", "geojson", "vector", True,
