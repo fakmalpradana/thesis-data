@@ -70,14 +70,10 @@ CATALOG_ROWS = [
     ("demnas", "forcing-acquisition/data/static/dem/demnas/DEMNAS_merged_UTM.tif", "geotiff", "raster", False,
      "BIG (user-supplied)", "DEMNAS merged, UTM"),
     ("dtm_dki_150cm", "forcing-acquisition/data/static/dem/jakarta/DTM_DKI_HYDRO_JALAN_1.5m.tif",
-     "geotiff", "raster", False, "user-supplied",
-     "DTM se-DKI Jakarta (hydro-enforced + jalan), 1.5m, tinggi elipsoid WGS 84 (bukan ortometrik)"),
-    ("dtm_dki_10m_ortho", "forcing-acquisition/data/static/dem/jakarta/DTM_DKI_10m_ortho.tif",
-     "geotiff", "raster", False, "derived: dtm_dki_150cm - EGM2008/INAGeoid2020",
-     "DTM 10m, tinggi ortometrik EGM2008 (INAGeoid2020 v2 grid tidak tersedia self-serve dari BIG)"),
-    ("dtm_dki_10m_N", "forcing-acquisition/data/static/dem/jakarta/DTM_DKI_10m_N.tif",
-     "geotiff", "raster", False, "derived: dtm_dki_150cm - EGM2008/INAGeoid2020",
-     "Separasi geoid N (EGM2008) pada grid 10m dipakai untuk dtm_dki_10m_ortho, untuk audit"),
+     "geotiff", "raster", False, "user-supplied (DCKTRP DKI)",
+     "DTM se-DKI Jakarta (hydro-enforced + jalan), 1.5m. Vertikal: ORTOMETRIK (geoid belum dikonfirmasi; "
+     "konsisten dengan DEMNAS EGM2008 +/-1 m, pantai 0.3-1 m). Klaim 'elipsoid WGS 84' dari DCKTRP tidak "
+     "sesuai isi raster - selisih thd DEMNAS ~0 m, bukan ~18 m. Cek 2026-09-12, scripts/check_dtm_datum.py"),
     ("osm_drainage", "forcing-acquisition/data/raw/osm_drainage/osm_drainage_106.6_-6.5_107.1_-6.0.json",
      "geojson", "vector", False, "OSM Overpass API", "Drainase/kanal, 4110 elemen"),
     ("batas_kota_dki", "reference/batas_adm/Batas Kota DKI.geojson", "geojson", "vector", True,
