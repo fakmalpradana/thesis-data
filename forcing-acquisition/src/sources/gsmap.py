@@ -37,9 +37,11 @@ NLON, NLAT = 3600, 1200
 RAW_DIR = Path(__file__).resolve().parents[2] / "data" / "raw" / "gsmap"
 
 
-def _url(dt: datetime) -> str:
+def _url(dt: datetime, rev: str = "1000") -> str:
+    # ponytail: file revision differs by period (early Nov 2023 = v8.0000.0, later = v8.1000.0);
+    # _fetch_hour tries 1000 then 0000. Add revisions here if a 550 shows up again.
     return (f"ftp://{HOST}/standard/v8/hourly_G/{dt:%Y/%m/%d}/"
-            f"gsmap_gauge.{dt:%Y%m%d.%H}00.v8.1000.0.dat.gz")
+            f"gsmap_gauge.{dt:%Y%m%d.%H}00.v8.{rev}.0.dat.gz")
 
 
 def available_range() -> tuple[date, date]:
@@ -71,10 +73,13 @@ def _fetch_hour(dt: datetime) -> np.ndarray | None:
     """Download+gunzip one hour, return the (1200,3600) grid or None on failure."""
     tmp = RAW_DIR / f"_tmp_{dt:%Y%m%d%H}.dat.gz"
     RAW_DIR.mkdir(parents=True, exist_ok=True)
-    r = run(["curl", "-n", "-sS", "--retry", "3", "--max-time", "60", "-o", str(tmp), _url(dt)],
-            capture_output=True, text=True)
-    if r.returncode != 0 or not tmp.exists() or tmp.stat().st_size == 0:
+    for rev in ("1000", "0000"):
+        r = run(["curl", "-n", "-sS", "--retry", "3", "--max-time", "60", "-o", str(tmp), _url(dt, rev)],
+                capture_output=True, text=True)
+        if r.returncode == 0 and tmp.exists() and tmp.stat().st_size > 0:
+            break
         tmp.unlink(missing_ok=True)
+    else:
         return None
     try:
         raw = gzip.decompress(tmp.read_bytes())

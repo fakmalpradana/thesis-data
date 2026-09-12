@@ -1,67 +1,67 @@
 # Rain source x loss comparison
 
-Configs present: chirps_mse
-Configs missing: gsmap_mse, gsmap_quantile
+Configs present: chirps_mse, gsmap_mse, gsmap_quantile
+Configs missing: none
 
 NSE by config, station x horizon:
 
 ```
-config                                         chirps_mse
-stasiun_id stasiun_nama               horizon            
-107        P.A. Cengkareng Drain      1             0.981
-                                      6             0.654
-                                      12            0.587
-                                      24            0.580
-126        P.A. Pulo Gadung 2         1             0.201
-                                      6             0.001
-                                      12           -0.075
-                                      24           -0.312
-140        P.A. Marina Ancol (Laut)   1             0.979
-                                      6             0.840
-                                      12            0.822
-                                      24            0.856
-150        P.S. Sunter Hulu           1             0.969
-                                      6             0.661
-                                      12            0.530
-                                      24            0.435
-162        Pompa Pasar Ikan 1         1             0.981
-                                      6             0.890
-                                      12            0.906
-                                      24            0.892
-164        Pompa Yos Sudarso 1        1             0.870
-                                      6             0.294
-                                      12           -0.012
-                                      24            0.182
-166        P.A. Marina Ancol (Kali)   1             0.916
-                                      6             0.742
-                                      12            0.710
-                                      24            0.711
-167        Rumah Pompa Pluit 1        1             0.964
-                                      6             0.611
-                                      12            0.216
-                                      24            0.090
-169        P.A. Kaliduri 1            1             0.922
-                                      6             0.243
-                                      12            0.121
-                                      24            0.148
-170        P.A. Ancol Flushing 1      1             0.988
-                                      6             0.807
-                                      12            0.688
-                                      24            0.668
-179        Pompa Kamal Muara (Bubble) 1             0.406
-                                      6            -0.846
-                                      12           -0.548
-                                      24           -0.408
-181        Pompa Kali Asin (Bubble)   1             0.708
-                                      6            -0.154
-                                      12           -0.308
-                                      24           -0.736
-184        Pompa Lagoa (Bubble)       1             0.648
-                                      6            -0.747
-                                      12           -0.634
-                                      24            0.289
-187        Pompa Cilincing (Bubble)   1             0.787
-                                      6             0.201
-                                      12            0.333
-                                      24            0.438
+config                                         chirps_mse  gsmap_mse  gsmap_quantile
+stasiun_id stasiun_nama               horizon                                       
+107        P.A. Cengkareng Drain      1             0.981      0.980           0.956
+                                      6             0.654      0.753           0.325
+                                      12            0.587      0.682           0.330
+                                      24            0.580      0.592           0.263
+126        P.A. Pulo Gadung 2         1             0.201      0.079           0.090
+                                      6             0.001     -0.073          -1.160
+                                      12           -0.075     -0.307          -3.034
+                                      24           -0.312     -0.467          -6.322
+140        P.A. Marina Ancol (Laut)   1             0.979      0.978           0.958
+                                      6             0.840      0.831           0.812
+                                      12            0.822      0.827           0.813
+                                      24            0.856      0.869           0.835
+150        P.S. Sunter Hulu           1             0.969      0.970           0.953
+                                      6             0.661      0.695           0.557
+                                      12            0.530      0.508           0.352
+                                      24            0.435      0.430           0.222
+162        Pompa Pasar Ikan 1         1             0.981      0.981           0.967
+                                      6             0.890      0.893           0.689
+                                      12            0.906      0.917           0.860
+                                      24            0.892      0.891           0.815
+164        Pompa Yos Sudarso 1        1             0.870      0.878           0.912
+                                      6             0.294      0.476           0.630
+                                      12           -0.012      0.567           0.579
+                                      24            0.182      0.496           0.605
+166        P.A. Marina Ancol (Kali)   1             0.916      0.913           0.913
+                                      6             0.742      0.741           0.691
+                                      12            0.710      0.711           0.573
+                                      24            0.711      0.689           0.503
+167        Rumah Pompa Pluit 1        1             0.964      0.959           0.954
+                                      6             0.611      0.559           0.496
+                                      12            0.216      0.131          -0.275
+                                      24            0.090      0.100          -0.143
+169        P.A. Kaliduri 1            1             0.922      0.925           0.908
+                                      6             0.243      0.245           0.241
+                                      12            0.121      0.138           0.055
+                                      24            0.148      0.165           0.052
+170        P.A. Ancol Flushing 1      1             0.988      0.988           0.984
+                                      6             0.807      0.817           0.744
+                                      12            0.688      0.709           0.686
+                                      24            0.668      0.659           0.613
+179        Pompa Kamal Muara (Bubble) 1             0.406      0.567           0.732
+                                      6            -0.846     -0.592          -0.362
+                                      12           -0.548     -0.471           0.034
+                                      24           -0.408      0.079           0.530
+181        Pompa Kali Asin (Bubble)   1             0.708      0.685           0.782
+                                      6            -0.154      0.157           0.213
+                                      12           -0.308     -0.295           0.035
+                                      24           -0.736     -0.719           0.327
+184        Pompa Lagoa (Bubble)       1             0.648      0.660           0.856
+                                      6            -0.747     -0.676          -0.193
+                                      12           -0.634     -0.455           0.015
+                                      24            0.289      0.170           0.507
+187        Pompa Cilincing (Bubble)   1             0.787      0.792           0.890
+                                      6             0.201      0.219           0.408
+                                      12            0.333      0.326           0.501
+                                      24            0.438      0.385           0.680
 ```

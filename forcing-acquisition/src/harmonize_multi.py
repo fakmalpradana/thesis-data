@@ -34,8 +34,9 @@ def _load_forcing(rain: str) -> pd.DataFrame:
     gpath = ROOT / "forcing-acquisition/data/processed/gsmap_hourly_stations.parquet"
     if not gpath.exists():
         raise SystemExit(f"--rain gsmap needs {gpath} (run fetch_gsmap.py + gsmap.to_hourly_series first)")
-    g = pd.read_parquet(gpath)
-    g["stasiun_id"] = g["stasiun_id"].replace({170: STATION_170_FALLBACK})
+    g = pd.read_parquet(gpath)  # 170 already carries the node-140 cell (fetch_gsmap.py)
+    g["waktu"] = g["waktu"].dt.tz_localize("UTC").dt.tz_convert(tide["waktu"].dt.tz)  # GSMaP stamps are UTC
+    g["stasiun_id"] = g["stasiun_id"].astype(str)
     g = g[["waktu", "stasiun_id", "hujan_mm"]].drop_duplicates(["waktu", "stasiun_id"])
     g["hujan_qc_flag"] = 0
     return g.merge(tide, on="waktu", how="inner"), "per_station"
