@@ -28,6 +28,8 @@ VIEWS = {
                  "Prediksi pasut EOT20, node 140, 2021-2026"),
     "forcing_hourly_multi": ("forcing-acquisition/data/processed/forcing_hourly_multi.parquet",
                              "TMA 14 stasiun Jakut + hujan + pasut (shared node-140 cell) jam-an"),
+    "forcing_hourly_multi_gsmap": ("forcing-acquisition/data/processed/forcing_hourly_multi_gsmap.parquet",
+                             "Sama seperti forcing_hourly_multi tapi hujan per-stasiun dari GSMaP_Gauge v8 jam-an"),
     "bpbd_banjir_2025_2026": ("validation/data/processed/data-kejadian-bencana-banjir.parquet",
                               "BPBD kejadian banjir per kelurahan/bulan, 2025Q1-2026Q1"),
     "bpbd_banjir_2024": ("validation/data/processed/data-kejadian-bencana-banjir-tahun-2024.parquet",
@@ -58,6 +60,12 @@ CATALOG_ROWS = [
      "harmonize.py (TMA+CHIRPS+EOT20)", "Forcing+label ter-align jam-an, node 140"),
     ("forcing_hourly_multi", "forcing-acquisition/data/processed/forcing_hourly_multi.parquet", "parquet", "tabular", True,
      "harmonize_multi.py", "Forcing+label jam-an, 14 stasiun Jakut, 369k baris"),
+    ("forcing_hourly_multi_gsmap", "forcing-acquisition/data/processed/forcing_hourly_multi_gsmap.parquet", "parquet",
+     "tabular", True, "harmonize_multi.py --rain gsmap", "Sama seperti forcing_hourly_multi, hujan per-stasiun dari GSMaP jam-an"),
+    ("gsmap_hourly_stations", "forcing-acquisition/data/processed/gsmap_hourly_stations.parquet", "parquet", "tabular",
+     True, "gsmap.py to_hourly_series()", "Hujan jam-an per stasiun (nearest 0.1deg cell) + bbox-mean, GSMaP_Gauge v8"),
+    ("gsmap_raw", "forcing-acquisition/data/raw/gsmap/{tahun}/gsmap_gauge_{YYYYMMDD}.npz", "npz", "raster", False,
+     "JAXA GSMaP_Gauge v8 hourly_G via FTP (hokusai.eorc.jaxa.jp)", "Hujan jam-an 0.1deg, bbox Jakarta Utara, per hari"),
     ("tide_140", "forcing-acquisition/data/processed/tide_140_2021_2026.parquet", "parquet", "tabular", True,
      "pyTMD + EOT20", "Prediksi pasut node 140"),
     ("chirps_yearly", "forcing-acquisition/data/raw/chirps/_yearly/chirps-v2.0.{tahun}.days_p05.nc", "netcdf",
@@ -122,9 +130,14 @@ def main() -> None:
     print(f"stations table: {len(st)} rows")
     con.execute(f"CREATE OR REPLACE VIEW events AS SELECT * FROM read_csv('{ROOT / 'validation/events.csv'}')")
     for name, (glob, desc) in VIEWS.items():
-        con.execute(f"CREATE OR REPLACE VIEW {name} AS SELECT * FROM read_parquet('{ROOT / glob}')")
-        n = con.execute(f"SELECT count(*) FROM {name}").fetchone()[0]
-        print(f"view {name}: {n} rows - {desc}")
+        try:
+            con.execute(f"CREATE OR REPLACE VIEW {name} AS SELECT * FROM read_parquet('{ROOT / glob}')")
+            n = con.execute(f"SELECT count(*) FROM {name}").fetchone()[0]
+            print(f"view {name}: {n} rows - {desc}")
+        except duckdb.IOException:
+            # e.g. forcing_hourly_multi_gsmap before the GSMaP fetch+harmonize has run - code is
+            # in place, just no file yet. Re-run this script once it exists.
+            print(f"view {name}: SKIPPED - {glob} not found yet")
 
     con.execute("""
         CREATE OR REPLACE TABLE catalog (

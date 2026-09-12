@@ -70,6 +70,12 @@ the absolute Siaga-3 cm threshold. `experiments/lstm_peakloss.py` retrains
 mean-reverting MSE explains the peak misses. Results: `reports/anomaly_f1/`,
 `reports/lstm_peakloss/`.
 
+GSMaP_Gauge v8 hourly rain (0.1deg, FTP from JAXA/EORC) is an alternative to
+CHIRPS daily for `forcing_hourly_multi`: `forcing-acquisition/scripts/fetch_gsmap.py`
+fetches it, `harmonize_multi.py --rain gsmap` builds `forcing_hourly_multi_gsmap.parquet`,
+and `lstm_multistation.py --rain gsmap --loss mse|quantile` + `experiments/compare_rain_loss.py`
+compare it against the CHIRPS/MSE baseline.
+
 ## Raw data
 
 Not tracked in git (see `.gitignore` in each pipeline + repo root) — either
