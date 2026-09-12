@@ -8,3 +8,5 @@ __pycache__/
 *.duckdb.wal
 .DS_Store
 __marimo__/
+validation/data/processed/sar/*.tif
+validation/data/processed/sar/*.geojson
