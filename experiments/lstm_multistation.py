@@ -1,13 +1,17 @@
 """LSTM baseline per Jakut station (split B_clean, horizons 1/6/12/24) reusing
 experiments/lstm_baseline.py. Answers RQ3 lead time per station.
 
-    python3 experiments/lstm_multistation.py [--quick] [--station ID] [--rain chirps|gsmap] [--loss mse|weighted|quantile]
+    python3 experiments/lstm_multistation.py [--quick] [--station ID] [--rain chirps|gsmap] [--loss mse|weighted|quantile] [--features base|persist] [--target level|resid]
 
 --station ID: run only that station and merge its rows into the existing
 metrics.json/csv (other stations' rows are kept as-is).
 --rain/--loss: default chirps/mse -> output dir unchanged (reports/lstm_multistation/);
 any other combo -> reports/lstm_multistation_{rain}_{loss}/, so the default
 run's output path/behavior is untouched.
+--features/--target: default base/level -> no change. persist/resid add the
+explicit 24h-persistence signal to the LSTM (see lstm_baseline.make_windows
+extra=True / fit_eval features=/target=); output dir gets a suffix (only
+when non-default), so default runs are untouched.
 
 Also scores F1/POD/FAR at the per-station train-p95 threshold (same
 definition as experiments/anomaly_f1.py) alongside NSE, so the comparison
@@ -31,10 +35,15 @@ from anomaly_f1 import confusion_metrics  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 
 
-def out_dir(rain: str, loss: str) -> Path:
-    if rain == "chirps" and loss == "mse":
+def out_dir(rain: str, loss: str, features: str = "base", target: str = "level") -> Path:
+    if rain == "chirps" and loss == "mse" and features == "base" and target == "level":
         return ROOT / "reports/lstm_multistation"  # unchanged default path
-    return ROOT / f"reports/lstm_multistation_{rain}_{loss}"
+    suffix = f"_{rain}_{loss}"
+    if features != "base":
+        suffix += f"_{features}"
+    if target != "level":
+        suffix += f"_{target}"
+    return ROOT / f"reports/lstm_multistation{suffix}"
 # Most Jakut stations only start Nov 2023, so the node-140 split (train 2021-23)
 # is unusable here. Common split for all stations; E1 (Jan 2025) lands in val,
 # E2 (Jan 2026) in test. keep_flags=True: at 126/166/169/170 the hourly qc_flag=8
@@ -52,12 +61,14 @@ SPLIT_OVERRIDES = {
 }
 
 
-def run_station(df: pd.DataFrame, horizons, epochs, device, sid: int, out: Path, loss: str) -> list[dict]:
+def run_station(df: pd.DataFrame, horizons, epochs, device, sid: int, out: Path, loss: str,
+                features: str = "base", target: str = "level") -> list[dict]:
     rows = []
     train_r, val_r, test_r, keep_flags = SPLIT_OVERRIDES.get(sid, SPLIT)
     df = lb.prepare(df)
+    need_extra = features == "persist" or target == "resid"
     for h in horizons:
-        win = lb.make_windows(df, horizon=h)
+        win = lb.make_windows(df, horizon=h, extra=need_extra)
         wt = win["waktu"]
         base = np.ones(len(win["y"]), bool) if keep_flags else (win["qc_any"] == 0)
         tr_m, va_m, te_m = (base & np.asarray((wt >= pd.Timestamp(r[0])) & (wt <= pd.Timestamp(r[1])))
@@ -66,7 +77,8 @@ def run_station(df: pd.DataFrame, horizons, epochs, device, sid: int, out: Path,
             rows.append({"horizon": h, "n_train": int(tr_m.sum()), "n_val": int(va_m.sum()), "n_test": int(te_m.sum()),
                          "note": "too few windows (126: no data Jan-Sep 2025 = val period)"})
             continue
-        r = lb.fit_eval(win, tr_m, va_m, te_m, epochs, device, loss={"weighted": "weighted_mse"}.get(loss, loss))
+        r = lb.fit_eval(win, tr_m, va_m, te_m, epochs, device, loss={"weighted": "weighted_mse"}.get(loss, loss),
+                         features=features, target=target)
         yhat = r.pop("yhat")
         # F1/POD/FAR at train-p95 threshold (anomaly_f1.py convention), flag-0 targets only.
         p95_thr = float(np.percentile(win["y"][tr_m], 95))
@@ -79,7 +91,8 @@ def run_station(df: pd.DataFrame, horizons, epochs, device, sid: int, out: Path,
     return rows
 
 
-def main(quick: bool, only_station: int | None, rain: str, loss: str) -> None:
+def main(quick: bool, only_station: int | None, rain: str, loss: str,
+         features: str = "base", target: str = "level") -> None:
     device = "mps" if torch.backends.mps.is_available() else "cpu"
     horizons, epochs = ([1, 24], 2) if quick else ([1, 6, 12, 24], 30)
     parquet_name = "forcing_hourly_multi.parquet" if rain == "chirps" else "forcing_hourly_multi_gsmap.parquet"
@@ -93,7 +106,7 @@ def main(quick: bool, only_station: int | None, rain: str, loss: str) -> None:
         raise SystemExit(f"--rain gsmap parquet only starts {multi['waktu'].min()}, split needs 2023-11-01")
     if only_station is not None:
         multi = multi[multi["stasiun_id"] == only_station]
-    out = out_dir(rain, loss)
+    out = out_dir(rain, loss, features, target)
     out.mkdir(parents=True, exist_ok=True)
     results = []
     t0 = time.time()
@@ -101,7 +114,7 @@ def main(quick: bool, only_station: int | None, rain: str, loss: str) -> None:
         name = g["stasiun_nama"].iloc[0]
         gdf = g.drop(columns=["stasiun_id", "stasiun_nama"]).reset_index(drop=True)
         gdf.attrs["sid"] = sid
-        for r in run_station(gdf, horizons, epochs, device, sid, out, loss):
+        for r in run_station(gdf, horizons, epochs, device, sid, out, loss, features, target):
             results.append({"stasiun_id": sid, "stasiun_nama": name, **r})
         print(f"{sid} {name}: done ({time.time() - t0:.0f}s)")
 
@@ -123,4 +136,6 @@ if __name__ == "__main__":
         station_arg = int(sys.argv[sys.argv.index("--station") + 1])
     rain_arg = sys.argv[sys.argv.index("--rain") + 1] if "--rain" in sys.argv else "chirps"
     loss_arg = sys.argv[sys.argv.index("--loss") + 1] if "--loss" in sys.argv else "mse"
-    main("--quick" in sys.argv, station_arg, rain_arg, loss_arg)
+    features_arg = sys.argv[sys.argv.index("--features") + 1] if "--features" in sys.argv else "base"
+    target_arg = sys.argv[sys.argv.index("--target") + 1] if "--target" in sys.argv else "level"
+    main("--quick" in sys.argv, station_arg, rain_arg, loss_arg, features_arg, target_arg)

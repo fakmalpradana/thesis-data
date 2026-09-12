@@ -17,8 +17,10 @@ CONFIGS = {
     "chirps_mse": ROOT / "reports/lstm_multistation",
     "gsmap_mse": ROOT / "reports/lstm_multistation_gsmap_mse",
     "gsmap_quantile": ROOT / "reports/lstm_multistation_gsmap_quantile",
+    "gsmap_mse_persist": ROOT / "reports/lstm_multistation_gsmap_mse_persist",
+    "gsmap_mse_persist_resid": ROOT / "reports/lstm_multistation_gsmap_mse_persist_resid",
 }
-COLS = ["stasiun_id", "stasiun_nama", "horizon", "lstm_nse", "lstm_rmse", "f1_p95", "pod_p95", "far_p95"]
+COLS = ["stasiun_id", "stasiun_nama", "horizon", "lstm_nse", "lstm_rmse", "persistence_nse", "f1_p95", "pod_p95", "far_p95"]
 
 
 def load(config: str, path: Path) -> pd.DataFrame | None:
@@ -49,11 +51,14 @@ def main() -> None:
     combined.to_csv(OUT / "metrics.csv", index=False)
 
     piv = combined.pivot_table(index=["stasiun_id", "stasiun_nama", "horizon"], columns="config", values="lstm_nse")
+    pers = combined.groupby(["stasiun_id", "stasiun_nama", "horizon"])["persistence_nse"].median()
     lines = [
         "# Rain source x loss comparison\n",
         f"Configs present: {', '.join(sorted(combined['config'].unique()))}",
         f"Configs missing: {', '.join(missing) if missing else 'none'}\n",
-        "NSE by config, station x horizon:\n", "```", piv.round(3).to_string(), "```",
+        "NSE by config, station x horizon (lstm_nse):\n", "```", piv.round(3).to_string(), "```",
+        "\npersistence_nse (median across present configs, per station x horizon):\n",
+        "```", pers.round(3).to_string(), "```",
     ]
     (OUT / "summary.md").write_text("\n".join(lines))
     print(f"present: {sorted(combined['config'].unique())}, missing: {missing}")

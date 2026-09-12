@@ -46,7 +46,7 @@ def prepare(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def make_windows(df: pd.DataFrame, lookback: int = LOOKBACK, horizon: int = 1) -> dict:
+def make_windows(df: pd.DataFrame, lookback: int = LOOKBACK, horizon: int = 1, extra: bool = False) -> dict:
     """Sliding windows: history = [t-lookback+1 .. t], target = t+horizon.
 
     X: (n, lookback, 3) of [tma_mean, tide_m, hujan_mm] over history (rain at
@@ -54,6 +54,10 @@ def make_windows(df: pd.DataFrame, lookback: int = LOOKBACK, horizon: int = 1) -
     leak same-day rain). tide_future = tide_m[t+horizon] (astronomical, known
     in advance -> not leakage). y = tma_mean[t+horizon]. y_last = tma_mean[t]
     (persistence prediction). Windows with any NaN are dropped.
+
+    extra=True also returns "extra": (n, 3) of [y[t+h-24], tide[t+h]-tide[t],
+    y[t]] -- the persistence signal, explicit. horizon <= 24 so t+h-24 <= t:
+    no leakage (asserted below).
     """
     tma = df["tma_mean"].to_numpy(float)
     tide = df["tide_m"].to_numpy(float)
@@ -78,10 +82,24 @@ def make_windows(df: pd.DataFrame, lookback: int = LOOKBACK, horizon: int = 1) -
     qc_any = np.fmax(np.nanmax(flag[hist_idx], axis=1), qc_target)
 
     valid = ~(np.isnan(X).any(axis=(1, 2)) | np.isnan(tide_future) | np.isnan(y) | np.isnan(y_last))
-    return dict(
+
+    extra_arr = None
+    if extra:
+        assert horizon <= 24, "persistence extra assumes horizon <= 24 (t+h-24 <= t)"
+        persist_idx = tgt_idx - 24
+        assert persist_idx.min() >= 0, "series too short for 24h persistence lookback"
+        assert np.all(persist_idx <= t_idx), "leakage: persistence index must not exceed current time"
+        y_persist = tma[persist_idx]
+        tide_delta = tide[tgt_idx] - tide[t_idx]
+        extra_arr = np.stack([y_persist, tide_delta, y_last], axis=-1)
+        valid = valid & ~np.isnan(extra_arr).any(axis=1)
+
+    out = dict(
         X=X[valid], tide_future=tide_future[valid], y=y[valid], y_last=y_last[valid],
         waktu=pd.to_datetime(waktu[tgt_idx][valid]), qc_flag=qc_target[valid], qc_any=qc_any[valid],
     )
+    out["extra"] = extra_arr[valid] if extra else None
+    return out
 
 
 def nse(y, yhat) -> float:
@@ -105,14 +123,16 @@ def persistence_baseline(y_last, y) -> dict:
 
 
 class LSTMModel(nn.Module):
-    def __init__(self, input_size=3, hidden=64):
+    def __init__(self, input_size=3, hidden=64, n_extra=1):
         super().__init__()
         self.lstm = nn.LSTM(input_size, hidden, batch_first=True)
-        self.fc = nn.Linear(hidden + 1, 1)
+        self.fc = nn.Linear(hidden + n_extra, 1)
 
-    def forward(self, seq, tide_future):
+    def forward(self, seq, extra):
         _, (h, _) = self.lstm(seq)
-        z = torch.cat([h[-1], tide_future.unsqueeze(-1)], dim=-1)
+        if extra.dim() == 1:  # backward-compat: single scalar (tide_future)
+            extra = extra.unsqueeze(-1)
+        z = torch.cat([h[-1], extra], dim=-1)
         return self.fc(z).squeeze(-1)
 
 
@@ -138,22 +158,23 @@ def make_loss(kind: str, y_tr_scaled: np.ndarray | None = None):
     raise ValueError(f"unknown loss kind: {kind}")
 
 
-def train(X_tr, tide_tr, y_tr, X_va, tide_va, y_va, epochs=30, patience=5, lr=1e-3, seed=42, device="cpu",
+def train(X_tr, extra_tr, y_tr, X_va, extra_va, y_va, epochs=30, patience=5, lr=1e-3, seed=42, device="cpu",
           loss_fn=None):
     torch.manual_seed(seed)
     random.seed(seed)
     np.random.seed(seed)
 
-    model = LSTMModel().to(device)
+    n_extra = 1 if extra_tr.ndim == 1 else extra_tr.shape[1]
+    model = LSTMModel(n_extra=n_extra).to(device)
     opt = torch.optim.Adam(model.parameters(), lr=lr)
     loss_fn = loss_fn or nn.MSELoss()
     val_loss_fn = nn.MSELoss()  # early-stop on plain MSE regardless of training loss
 
     Xtr_t = torch.tensor(X_tr, dtype=torch.float32, device=device)
-    Ttr_t = torch.tensor(tide_tr, dtype=torch.float32, device=device)
+    Ttr_t = torch.tensor(extra_tr, dtype=torch.float32, device=device)
     Ytr_t = torch.tensor(y_tr, dtype=torch.float32, device=device)
     Xva_t = torch.tensor(X_va, dtype=torch.float32, device=device)
-    Tva_t = torch.tensor(tide_va, dtype=torch.float32, device=device)
+    Tva_t = torch.tensor(extra_va, dtype=torch.float32, device=device)
     Yva_t = torch.tensor(y_va, dtype=torch.float32, device=device)
 
     ds = torch.utils.data.TensorDataset(Xtr_t, Ttr_t, Ytr_t)
@@ -179,34 +200,58 @@ def train(X_tr, tide_tr, y_tr, X_va, tide_va, y_va, epochs=30, patience=5, lr=1e
     return model
 
 
-def fit_eval(win, tr_m, va_m, te_m, epochs, device, loss="mse"):
+def fit_eval(win, tr_m, va_m, te_m, epochs, device, loss="mse", features="base", target="level"):
     """Train on tr_m, early-stop on va_m, score on te_m. Returns metrics dict + yhat.
 
     loss: 'mse' (default -- nothing else changes), 'weighted_mse', or 'quantile'.
+    features: 'base' (default -- tide_future only, unchanged) or 'persist' (the
+    3-column persistence block from make_windows(..., extra=True): [y[t+h-24],
+    tide[t+h]-tide[t], y[t]]).
+    target: 'level' (default, unchanged) or 'resid' -- network predicts
+    y(t+h) - y(t+h-24); the persistence value is added back before metrics.
+    features='persist'/target='resid' require win from make_windows(extra=True).
     """
+    assert features in ("base", "persist") and target in ("level", "resid")
+    if features == "persist" or target == "resid":
+        assert win.get("extra") is not None, "make_windows(..., extra=True) required for features='persist'/target='resid'"
+
     fmean = win["X"][tr_m].reshape(-1, 3).mean(axis=0)
     fstd = win["X"][tr_m].reshape(-1, 3).std(axis=0) + 1e-8
-    ymean, ystd = win["y"][tr_m].mean(), win["y"][tr_m].std() + 1e-8
-    y_tr_scaled = (win["y"][tr_m] - ymean) / ystd
+
+    if features == "base":
+        extra_all = win["tide_future"]  # 1D -- backward compatible with old tide_future path
+
+        def norm_E(m):
+            return (extra_all[m] - fmean[1]) / fstd[1]
+    else:
+        extra_all = win["extra"]  # (N, 3)
+        emean = extra_all[tr_m].mean(axis=0)
+        estd = extra_all[tr_m].std(axis=0) + 1e-8
+
+        def norm_E(m):
+            return (extra_all[m] - emean) / estd
+
+    y_level = win["y"]
+    y_net = y_level - win["extra"][:, 0] if target == "resid" else y_level
+
+    ymean, ystd = y_net[tr_m].mean(), y_net[tr_m].std() + 1e-8
+    y_tr_scaled = (y_net[tr_m] - ymean) / ystd
     loss_fn = make_loss(loss, y_tr_scaled)
 
     def norm_X(m):
         return (win["X"][m] - fmean) / fstd
 
-    def norm_T(m):
-        return (win["tide_future"][m] - fmean[1]) / fstd[1]
-
     try:
         model = train(
-            norm_X(tr_m), norm_T(tr_m), y_tr_scaled,
-            norm_X(va_m), norm_T(va_m), (win["y"][va_m] - ymean) / ystd,
+            norm_X(tr_m), norm_E(tr_m), y_tr_scaled,
+            norm_X(va_m), norm_E(va_m), (y_net[va_m] - ymean) / ystd,
             epochs=epochs, device=device, loss_fn=loss_fn,
         )
     except (RuntimeError, NotImplementedError):
         device = "cpu"
         model = train(
-            norm_X(tr_m), norm_T(tr_m), y_tr_scaled,
-            norm_X(va_m), norm_T(va_m), (win["y"][va_m] - ymean) / ystd,
+            norm_X(tr_m), norm_E(tr_m), y_tr_scaled,
+            norm_X(va_m), norm_E(va_m), (y_net[va_m] - ymean) / ystd,
             epochs=epochs, device=device, loss_fn=loss_fn,
         )
 
@@ -214,9 +259,10 @@ def fit_eval(win, tr_m, va_m, te_m, epochs, device, loss="mse"):
     with torch.no_grad():
         yhat_n = model(
             torch.tensor(norm_X(te_m), dtype=torch.float32, device=device),
-            torch.tensor(norm_T(te_m), dtype=torch.float32, device=device),
+            torch.tensor(norm_E(te_m), dtype=torch.float32, device=device),
         ).cpu().numpy()
-    yhat = yhat_n * ystd + ymean
+    yhat_net = yhat_n * ystd + ymean
+    yhat = yhat_net + win["extra"][te_m, 0] if target == "resid" else yhat_net
     y_te, ylast_te, flag_te = win["y"][te_m], win["y_last"][te_m], win["qc_flag"][te_m]
     f0 = flag_te == 0
 
@@ -289,6 +335,18 @@ def _self_check():
     w = make_windows(tiny, lookback=3, horizon=1)
     assert w["X"].shape == (7, 3, 3), w["X"].shape
     assert len(w["y"]) == 7 and len(w["waktu"]) == 7
+    assert w["extra"] is None
+
+    # target="resid" self-check: exactly 24h-periodic series -> residual target all zeros.
+    n = 200
+    periodic = pd.DataFrame(dict(
+        waktu=pd.date_range("2021-01-01", periods=n, freq="h"),
+        tma_mean=np.tile(np.sin(np.linspace(0, 2 * np.pi, 24, endpoint=False)), n // 24 + 1)[:n],
+        tide_m=np.zeros(n), hujan_mm=np.zeros(n), tma_qc_flag=np.zeros(n),
+    ))
+    wp = make_windows(periodic, lookback=72, horizon=24, extra=True)
+    resid = wp["y"] - wp["extra"][:, 0]
+    assert np.allclose(resid, 0, atol=1e-9), resid[:5]
 
 
 if __name__ == "__main__":
