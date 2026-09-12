@@ -57,6 +57,12 @@ viewer: `marimo edit notebooks/02_lstm_baseline.py`.
 stations on `forcing_hourly_multi` (split train Nov 2023–Dec 2024 / val
 Jan–Apr 2025 / test May 2025–Sep 2026). Results: `reports/lstm_multistation/`.
 
+`experiments/siaga_f1.py` scores Siaga-3 exceedance (F1/CSI/POD/FAR, LSTM vs
+persistence) per station/horizon and per event (E2/E6/E7) against BPBD +
+PetaBencana ground truth. `notebooks/03_xcorr_events.py` cross-correlates
+TMA with tide/rain and classifies each event pluvial/tidal/compound.
+Results: `reports/siaga_f1/`, `reports/xcorr/`.
+
 ## Raw data
 
 Not tracked in git (see `.gitignore` in each pipeline + repo root) — either
