@@ -116,14 +116,38 @@ class LSTMModel(nn.Module):
         return self.fc(z).squeeze(-1)
 
 
-def train(X_tr, tide_tr, y_tr, X_va, tide_va, y_va, epochs=30, patience=5, lr=1e-3, seed=42, device="cpu"):
+def make_loss(kind: str, y_tr_scaled: np.ndarray | None = None):
+    """kind: 'mse' (default), 'weighted_mse' (5x on top decile of train y), or
+    'quantile' (pinball, tau=0.9) -- for Task B's peak-loss comparison."""
+    if kind == "mse":
+        return nn.MSELoss()
+    if kind == "weighted_mse":
+        thr = np.percentile(y_tr_scaled, 90)
+
+        def f(pred, target):
+            w = 1 + 4 * (target > thr).float()
+            return (w * (pred - target) ** 2).mean()
+        return f
+    if kind == "quantile":
+        tau = 0.9
+
+        def f(pred, target):
+            e = target - pred
+            return torch.mean(torch.maximum(tau * e, (tau - 1) * e))
+        return f
+    raise ValueError(f"unknown loss kind: {kind}")
+
+
+def train(X_tr, tide_tr, y_tr, X_va, tide_va, y_va, epochs=30, patience=5, lr=1e-3, seed=42, device="cpu",
+          loss_fn=None):
     torch.manual_seed(seed)
     random.seed(seed)
     np.random.seed(seed)
 
     model = LSTMModel().to(device)
     opt = torch.optim.Adam(model.parameters(), lr=lr)
-    loss_fn = nn.MSELoss()
+    loss_fn = loss_fn or nn.MSELoss()
+    val_loss_fn = nn.MSELoss()  # early-stop on plain MSE regardless of training loss
 
     Xtr_t = torch.tensor(X_tr, dtype=torch.float32, device=device)
     Ttr_t = torch.tensor(tide_tr, dtype=torch.float32, device=device)
@@ -144,7 +168,7 @@ def train(X_tr, tide_tr, y_tr, X_va, tide_va, y_va, epochs=30, patience=5, lr=1e
             opt.step()
         model.eval()
         with torch.no_grad():
-            val_loss = loss_fn(model(Xva_t, Tva_t), Yva_t).item()
+            val_loss = val_loss_fn(model(Xva_t, Tva_t), Yva_t).item()
         if val_loss < best_val:
             best_val, best_state, bad = val_loss, {k: v.clone() for k, v in model.state_dict().items()}, 0
         else:
@@ -155,11 +179,16 @@ def train(X_tr, tide_tr, y_tr, X_va, tide_va, y_va, epochs=30, patience=5, lr=1e
     return model
 
 
-def fit_eval(win, tr_m, va_m, te_m, epochs, device):
-    """Train on tr_m, early-stop on va_m, score on te_m. Returns metrics dict + yhat."""
+def fit_eval(win, tr_m, va_m, te_m, epochs, device, loss="mse"):
+    """Train on tr_m, early-stop on va_m, score on te_m. Returns metrics dict + yhat.
+
+    loss: 'mse' (default -- nothing else changes), 'weighted_mse', or 'quantile'.
+    """
     fmean = win["X"][tr_m].reshape(-1, 3).mean(axis=0)
     fstd = win["X"][tr_m].reshape(-1, 3).std(axis=0) + 1e-8
     ymean, ystd = win["y"][tr_m].mean(), win["y"][tr_m].std() + 1e-8
+    y_tr_scaled = (win["y"][tr_m] - ymean) / ystd
+    loss_fn = make_loss(loss, y_tr_scaled)
 
     def norm_X(m):
         return (win["X"][m] - fmean) / fstd
@@ -169,16 +198,16 @@ def fit_eval(win, tr_m, va_m, te_m, epochs, device):
 
     try:
         model = train(
-            norm_X(tr_m), norm_T(tr_m), (win["y"][tr_m] - ymean) / ystd,
+            norm_X(tr_m), norm_T(tr_m), y_tr_scaled,
             norm_X(va_m), norm_T(va_m), (win["y"][va_m] - ymean) / ystd,
-            epochs=epochs, device=device,
+            epochs=epochs, device=device, loss_fn=loss_fn,
         )
     except (RuntimeError, NotImplementedError):
         device = "cpu"
         model = train(
-            norm_X(tr_m), norm_T(tr_m), (win["y"][tr_m] - ymean) / ystd,
+            norm_X(tr_m), norm_T(tr_m), y_tr_scaled,
             norm_X(va_m), norm_T(va_m), (win["y"][va_m] - ymean) / ystd,
-            epochs=epochs, device=device,
+            epochs=epochs, device=device, loss_fn=loss_fn,
         )
 
     model.eval()

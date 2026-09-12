@@ -63,6 +63,13 @@ PetaBencana ground truth. `notebooks/03_xcorr_events.py` cross-correlates
 TMA with tide/rain and classifies each event pluvial/tidal/compound.
 Results: `reports/siaga_f1/`, `reports/xcorr/`.
 
+`experiments/anomaly_f1.py` re-scores LSTM vs persistence with per-station,
+datum-free event definitions (train p95, and rise-over-24h-median) instead of
+the absolute Siaga-3 cm threshold. `experiments/lstm_peakloss.py` retrains
+3 stations at h=6/12 with weighted-MSE and quantile loss to test whether
+mean-reverting MSE explains the peak misses. Results: `reports/anomaly_f1/`,
+`reports/lstm_peakloss/`.
+
 ## Raw data
 
 Not tracked in git (see `.gitignore` in each pipeline + repo root) — either
