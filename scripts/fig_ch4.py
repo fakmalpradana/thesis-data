@@ -342,29 +342,35 @@ def fig_4_7():
             transform=ax.transAxes, fontsize=5.5, color="0.3", va="bottom", zorder=6,
             bbox=dict(boxstyle="square,pad=0.25", fc="white", ec="none", alpha=0.85))
 
-    # --- inset: position of Jakarta Utara within DKI Jakarta, UTM metres, upper left
+    # --- inset: western Java context (Natural Earth 10 m provinces), UTM metres, lower left
+    ne = gpd.read_file(ROOT / "reference/naturalearth/ne10m_provinces_west_java.gpkg").to_crs(edges.crs)
     dki = gpd.read_file(ROOT / "reference/batas_adm/Batas Kota DKI.geojson").to_crs(edges.crs)
     ins = ax.inset_axes([0.02, 0.115, 0.30, 0.30])
-    dki.boundary.plot(ax=ins, color="0.4", lw=0.4)
-    dki[dki["NAMOBJ"] == "Kota Adm. Jakarta Utara"].plot(ax=ins, color=TAB10[1], alpha=0.45, edgecolor="k", lw=0.5)
+    ins.set_facecolor("#dbe9f4")  # sea
+    ne.plot(ax=ins, color="#f2efe9", edgecolor="0.55", lw=0.35)
+    dki.dissolve().plot(ax=ins, color=TAB10[1], alpha=0.85, edgecolor="k", lw=0.4)
     ins.add_patch(Rectangle((xlim[0], ylim[0]), xlim[1] - xlim[0], ylim[1] - ylim[0],
-                            fill=False, edgecolor="red", lw=0.7))
-    dminx, dminy, dmaxx, dmaxy = dki.total_bounds
-    ins.set_xlim(dminx - 3000, dmaxx + 3000); ins.set_ylim(dminy - 3000, dmaxy + 3000)
+                            fill=False, edgecolor="red", lw=0.8))
+    cx, cy = (xlim[0] + xlim[1]) / 2, (ylim[0] + ylim[1]) / 2
+    half = 220_000  # ~440 km window: Sunda Strait to Cirebon
+    ins.set_xlim(cx - half, cx + half); ins.set_ylim(cy - half * 0.95, cy + half * 0.55)
     ins.set_aspect("equal")
-    ins.xaxis.set_major_locator(MultipleLocator(20000)); ins.yaxis.set_major_locator(MultipleLocator(20000))
+    for nm, (dx, dy) in {"Jawa Barat": (60_000, -110_000), "Banten": (-110_000, -60_000),
+                         "Lampung": (-175_000, 45_000)}.items():
+        ins.text(cx + dx, cy + dy, nm, fontsize=4.5, color="0.35", ha="center", style="italic")
+    ins.text(cx, cy + 22_000, "DKI Jakarta", fontsize=4.5, ha="center", va="bottom", fontweight="bold")
+    ins.text(cx + 120_000, cy + 60_000, "Java Sea", fontsize=4.2, color="0.45", ha="center", style="italic")
+    ins.xaxis.set_major_locator(MultipleLocator(200_000)); ins.yaxis.set_major_locator(MultipleLocator(200_000))
     ins.xaxis.set_major_formatter(m_fmt); ins.yaxis.set_major_formatter(m_fmt)
     ins.tick_params(labelsize=4.5, length=2, pad=1)
-    ins.xaxis.set_major_locator(MultipleLocator(20000)); ins.set_xticks([700000, 720000])
     for lab in ins.get_yticklabels():
         lab.set_rotation(90); lab.set_va("center")
-    ins.text(0.5, 0.97, "DKI Jakarta\nJakarta Utara shaded · map extent in red", transform=ins.transAxes,
-             ha="center", va="top", fontsize=5, bbox=dict(fc="white", ec="none", alpha=0.85, pad=1))
-    ins.set_facecolor("white")
+    ins.text(0.5, 0.97, "Western Java — map extent in red", transform=ins.transAxes, ha="center", va="top",
+             fontsize=5, bbox=dict(fc="white", ec="none", alpha=0.85, pad=1))
     for sp in ins.spines.values():
         sp.set_linewidth(0.5)
     save(fig, "fig4_7_canal_graph_stations")
-    NOTES.append(("4.7", "UTM metre grid (northing labels rotated), inset of DKI with map extent, line+point legend, north arrow, 5 km scale bar, CRS/datum note (13 Sep). Station 150 Sunter Hulu lies upstream on Kali Sunter (Jakarta Timur), outside the Jakut boundary -- state in caption. Station 170 Ancol Flushing is NOT drawn (no published coordinates; NULL in `stations`) -- state in caption; "
+    NOTES.append(("4.7", "UTM metre grid (northing labels rotated), inset of western Java (Natural Earth 10 m) with map extent, line+point legend, north arrow, 5 km scale bar, CRS/datum note (13 Sep). Station 150 Sunter Hulu lies upstream on Kali Sunter (Jakarta Timur), outside the Jakut boundary -- state in caption. Station 170 Ancol Flushing is NOT drawn (no published coordinates; NULL in `stations`) -- state in caption; "
                           "station 170 has no koordinat in stations.yaml, resolved via the "
                           "catalog `stations` table instead"))
 
@@ -379,7 +385,7 @@ README = """# Chapter 4 figures
 | fig4_4_median_nse_vs_horizon_configs | `reports/compare_rain_loss/metrics.csv` | 04-2 Multi-station LSTM |
 | fig4_5_event_E2_140_107 | `reports/lstm_multistation_gsmap_mse_persist_resid/pred_{140,107}_h6.parquet`, `forcing-acquisition/data/processed/forcing_hourly_multi_gsmap.parquet` | 04-2 Multi-station LSTM |
 | fig4_6_f1_far_scatter | `reports/compare_rain_loss/metrics.csv` | 04-2 Multi-station LSTM |
-| fig4_7_canal_graph_stations | `reference/jakarta/canal_graph.gpkg`, `reference/batas_adm/Batas Kota DKI.geojson`, `catalog.duckdb` (`stations` table) / `tinggi_air/config/stations.yaml` | 04-2 Multi-station LSTM |
+| fig4_7_canal_graph_stations | `reference/jakarta/canal_graph.gpkg`, `reference/batas_adm/Batas Kota DKI.geojson`, `reference/naturalearth/ne10m_provinces_west_java.gpkg`, `catalog.duckdb` (`stations` table) / `tinggi_air/config/stations.yaml` | 04-2 Multi-station LSTM |
 
 Each figure is exported as `.png` (200 dpi) and `.svg`. Generated by `scripts/fig_ch4.py`.
 """
