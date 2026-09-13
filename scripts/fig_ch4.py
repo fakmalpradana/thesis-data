@@ -281,7 +281,12 @@ def fig_4_7():
     xlim, ylim = (minx - buf, maxx + buf), (miny - buf, maxy + buf)
     edges = edges.cx[xlim[0]:xlim[1], ylim[0]:ylim[1]]
 
-    fig, ax = plt.subplots(figsize=(WIDE, WIDE * 0.9))
+    from matplotlib.lines import Line2D
+    from matplotlib.patches import Rectangle
+    from matplotlib.ticker import FuncFormatter, MultipleLocator
+    from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
+
+    fig, ax = plt.subplots(figsize=(WIDE, WIDE * 0.95))
     boundary.boundary.plot(ax=ax, color="black", lw=0.8)
     low_z = edges[edges["z_mean"] < 0]
     high_z = edges[~(edges["z_mean"] < 0)]
@@ -296,43 +301,70 @@ def fig_4_7():
     for cls, color in cls_colors.items():
         sub = gdf[gdf["cls"] == cls]
         ax.scatter(sub.geometry.x, sub.geometry.y, color=color, s=22, label=cls, zorder=5, edgecolor="k", lw=0.3)
-    label_off = {166: (3, -9), 170: (5, 8), 140: (-16, 4), 184: (3, -9), 126: (-16, 4)}  # de-overlap
+    label_off = {166: (3, -9), 170: (6, 12), 140: (-18, 3), 162: (-14, -10), 184: (3, -9), 126: (-16, 4), 187: (-6, 5)}  # de-overlap
     for _, row in gdf.iterrows():
         ax.annotate(str(row["stasiun_id"]), (row.geometry.x, row.geometry.y), fontsize=6,
                     xytext=label_off.get(int(row["stasiun_id"]), (3, 3)), textcoords="offset points")
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
     ax.set_aspect("equal")
-    ax.legend(frameon=False, fontsize=7, loc="lower left", bbox_to_anchor=(0.0, 0.07))
 
-    # --- map furniture: UTM grid, lon/lat edge labels, north arrow, scale bar, CRS note
-    from matplotlib.ticker import FuncFormatter, MultipleLocator
-    from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
-    from pyproj import Transformer
-    km = FuncFormatter(lambda v, _: f"{v/1000:.0f}")
+    # --- UTM grid in metres, northing labels rotated; no geographic axes
+    m_fmt = FuncFormatter(lambda v, _: f"{v:,.0f}".replace(",", " "))
     ax.xaxis.set_major_locator(MultipleLocator(5000)); ax.yaxis.set_major_locator(MultipleLocator(5000))
-    ax.xaxis.set_major_formatter(km); ax.yaxis.set_major_formatter(km)
-    ax.set_xlabel("Easting (km), UTM 48S"); ax.set_ylabel("Northing (km), UTM 48S")
+    ax.xaxis.set_major_formatter(m_fmt); ax.yaxis.set_major_formatter(m_fmt)
+    ax.tick_params(axis="y", labelrotation=90, labelsize=7); ax.tick_params(axis="x", labelsize=7)
+    for lab in ax.get_yticklabels():
+        lab.set_va("center")
+    ax.set_xlabel("Easting (m) — WGS 84 / UTM zone 48S"); ax.set_ylabel("Northing (m) — WGS 84 / UTM zone 48S")
     ax.grid(True, color="0.85", lw=0.4, zorder=0)
-    ax.tick_params(labelsize=7)
-    to_ll = Transformer.from_crs(edges.crs, "EPSG:4326", always_xy=True)
-    y_mid, x_mid = sum(ylim) / 2, sum(xlim) / 2
-    top = ax.secondary_xaxis("top", functions=(lambda x: x, lambda x: x))
-    top.set_xticks(ax.get_xticks()[1:-1])
-    top.set_xticklabels([f"{to_ll.transform(x, y_mid)[0]:.2f}°E" for x in ax.get_xticks()[1:-1]], fontsize=6)
-    right = ax.secondary_yaxis("right", functions=(lambda y: y, lambda y: y))
-    right.set_yticks(ax.get_yticks()[1:-1])
-    right.set_yticklabels([f"{-to_ll.transform(x_mid, y)[1]:.2f}°S" for y in ax.get_yticks()[1:-1]], fontsize=6)
-    ax.annotate("N", xy=(0.95, 0.93), xytext=(0.95, 0.82), xycoords="axes fraction", ha="center", va="center",
+
+    # --- legend: points + lines, single box, upper right (empty sea/land corner)
+    handles = [Line2D([], [], marker="o", ls="", color=c, markeredgecolor="k", markeredgewidth=0.3, label=k)
+               for k, c in cls_colors.items()]
+    handles += [Line2D([], [], color=TAB10[0], lw=1.2, label="canal segment below MSL (z < 0)"),
+                Line2D([], [], color="0.6", lw=1.0, label="canal / drain (OSM)"),
+                Line2D([], [], color="k", lw=1.0, label="Kota Adm. Jakarta Utara")]
+    ax.legend(handles=handles, frameon=True, framealpha=0.9, edgecolor="0.8", fontsize=6.5,
+              loc="center right", bbox_to_anchor=(0.995, 0.42), title="Stations / lines", title_fontsize=7)
+
+    # --- north arrow (upper right) and 5 km scale bar (lower right, under legend)
+    ax.annotate("N", xy=(0.96, 0.95), xytext=(0.96, 0.86), xycoords="axes fraction", ha="center", va="center",
                 fontsize=9, fontweight="bold",
                 arrowprops=dict(arrowstyle="-|>", color="k", lw=1.2, shrinkA=0, shrinkB=0))
-    ax.add_artist(AnchoredSizeBar(ax.transData, 5000, "5 km", "lower right", pad=0.4, sep=3,
+    ax.add_artist(AnchoredSizeBar(ax.transData, 5000, "5 km", "lower right", pad=0.5, sep=3,
                                   color="k", frameon=False, size_vertical=120, fontproperties=dict(size=7)))
-    ax.text(0.01, 0.01, "CRS: WGS 84 / UTM zone 48S (EPSG:32748) · vertical: orthometric (DTM 1.5 m, geoid unconfirmed)\n"
-            "Canal graph: OpenStreetMap contributors (ODbL) · boundary: Batas Kota DKI · stations: DSDA DKI",
-            transform=ax.transAxes, fontsize=5.5, color="0.3", va="bottom")
+
+    # --- CRS / datum / sources note, bottom-left inside the frame (nothing else lives there)
+    ax.text(0.01, 0.01, "CRS: WGS 84 / UTM zone 48S (EPSG:32748), grid in metres\n"
+            "Vertical: orthometric (DTM 1.5 m; geoid unconfirmed)\n"
+            "Canal graph: OpenStreetMap contributors (ODbL) · boundary: Batas Kota DKI · stations: DSDA",
+            transform=ax.transAxes, fontsize=5.5, color="0.3", va="bottom", zorder=6,
+            bbox=dict(boxstyle="square,pad=0.25", fc="white", ec="none", alpha=0.85))
+
+    # --- inset: position of Jakarta Utara within DKI Jakarta, UTM metres, upper left
+    dki = gpd.read_file(ROOT / "reference/batas_adm/Batas Kota DKI.geojson").to_crs(edges.crs)
+    ins = ax.inset_axes([0.02, 0.115, 0.30, 0.30])
+    dki.boundary.plot(ax=ins, color="0.4", lw=0.4)
+    dki[dki["NAMOBJ"] == "Kota Adm. Jakarta Utara"].plot(ax=ins, color=TAB10[1], alpha=0.45, edgecolor="k", lw=0.5)
+    ins.add_patch(Rectangle((xlim[0], ylim[0]), xlim[1] - xlim[0], ylim[1] - ylim[0],
+                            fill=False, edgecolor="red", lw=0.7))
+    dminx, dminy, dmaxx, dmaxy = dki.total_bounds
+    ins.set_xlim(dminx - 3000, dmaxx + 3000); ins.set_ylim(dminy - 3000, dmaxy + 3000)
+    ins.set_aspect("equal")
+    ins.xaxis.set_major_locator(MultipleLocator(20000)); ins.yaxis.set_major_locator(MultipleLocator(20000))
+    ins.xaxis.set_major_formatter(m_fmt); ins.yaxis.set_major_formatter(m_fmt)
+    ins.tick_params(labelsize=4.5, length=2, pad=1)
+    ins.xaxis.set_major_locator(MultipleLocator(20000)); ins.set_xticks([700000, 720000])
+    for lab in ins.get_yticklabels():
+        lab.set_rotation(90); lab.set_va("center")
+    ins.text(0.5, 0.97, "DKI Jakarta\nJakarta Utara shaded · map extent in red", transform=ins.transAxes,
+             ha="center", va="top", fontsize=5, bbox=dict(fc="white", ec="none", alpha=0.85, pad=1))
+    ins.set_facecolor("white")
+    for sp in ins.spines.values():
+        sp.set_linewidth(0.5)
     save(fig, "fig4_7_canal_graph_stations")
-    NOTES.append(("4.7", "UTM km grid + lon/lat edge labels, north arrow, 5 km scale bar, CRS/datum note (13 Sep); "
+    NOTES.append(("4.7", "UTM metre grid (northing labels rotated), inset of DKI with map extent, line+point legend, north arrow, 5 km scale bar, CRS/datum note (13 Sep). Station 150 Sunter Hulu lies upstream on Kali Sunter (Jakarta Timur), outside the Jakut boundary -- state in caption. Station 170 Ancol Flushing is NOT drawn (no published coordinates; NULL in `stations`) -- state in caption; "
                           "station 170 has no koordinat in stations.yaml, resolved via the "
                           "catalog `stations` table instead"))
 
