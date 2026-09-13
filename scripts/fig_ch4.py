@@ -296,18 +296,43 @@ def fig_4_7():
     for cls, color in cls_colors.items():
         sub = gdf[gdf["cls"] == cls]
         ax.scatter(sub.geometry.x, sub.geometry.y, color=color, s=22, label=cls, zorder=5, edgecolor="k", lw=0.3)
+    label_off = {166: (3, -9), 170: (5, 8), 140: (-16, 4), 184: (3, -9), 126: (-16, 4)}  # de-overlap
     for _, row in gdf.iterrows():
         ax.annotate(str(row["stasiun_id"]), (row.geometry.x, row.geometry.y), fontsize=6,
-                    xytext=(3, 3), textcoords="offset points")
+                    xytext=label_off.get(int(row["stasiun_id"]), (3, 3)), textcoords="offset points")
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
     ax.set_aspect("equal")
-    ax.set_axis_off()
-    ax.legend(frameon=False, fontsize=7, loc="lower left")
-    # ponytail: north arrow / scale bar skipped -- adds > 10 lines for a chapter-4
-    # figure whose axes already carry no coordinate grid; plan allows skipping.
+    ax.legend(frameon=False, fontsize=7, loc="lower left", bbox_to_anchor=(0.0, 0.07))
+
+    # --- map furniture: UTM grid, lon/lat edge labels, north arrow, scale bar, CRS note
+    from matplotlib.ticker import FuncFormatter, MultipleLocator
+    from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
+    from pyproj import Transformer
+    km = FuncFormatter(lambda v, _: f"{v/1000:.0f}")
+    ax.xaxis.set_major_locator(MultipleLocator(5000)); ax.yaxis.set_major_locator(MultipleLocator(5000))
+    ax.xaxis.set_major_formatter(km); ax.yaxis.set_major_formatter(km)
+    ax.set_xlabel("Easting (km), UTM 48S"); ax.set_ylabel("Northing (km), UTM 48S")
+    ax.grid(True, color="0.85", lw=0.4, zorder=0)
+    ax.tick_params(labelsize=7)
+    to_ll = Transformer.from_crs(edges.crs, "EPSG:4326", always_xy=True)
+    y_mid, x_mid = sum(ylim) / 2, sum(xlim) / 2
+    top = ax.secondary_xaxis("top", functions=(lambda x: x, lambda x: x))
+    top.set_xticks(ax.get_xticks()[1:-1])
+    top.set_xticklabels([f"{to_ll.transform(x, y_mid)[0]:.2f}°E" for x in ax.get_xticks()[1:-1]], fontsize=6)
+    right = ax.secondary_yaxis("right", functions=(lambda y: y, lambda y: y))
+    right.set_yticks(ax.get_yticks()[1:-1])
+    right.set_yticklabels([f"{-to_ll.transform(x_mid, y)[1]:.2f}°S" for y in ax.get_yticks()[1:-1]], fontsize=6)
+    ax.annotate("N", xy=(0.95, 0.93), xytext=(0.95, 0.82), xycoords="axes fraction", ha="center", va="center",
+                fontsize=9, fontweight="bold",
+                arrowprops=dict(arrowstyle="-|>", color="k", lw=1.2, shrinkA=0, shrinkB=0))
+    ax.add_artist(AnchoredSizeBar(ax.transData, 5000, "5 km", "lower right", pad=0.4, sep=3,
+                                  color="k", frameon=False, size_vertical=120, fontproperties=dict(size=7)))
+    ax.text(0.01, 0.01, "CRS: WGS 84 / UTM zone 48S (EPSG:32748) · vertical: orthometric (DTM 1.5 m, geoid unconfirmed)\n"
+            "Canal graph: OpenStreetMap contributors (ODbL) · boundary: Batas Kota DKI · stations: DSDA DKI",
+            transform=ax.transAxes, fontsize=5.5, color="0.3", va="bottom")
     save(fig, "fig4_7_canal_graph_stations")
-    NOTES.append(("4.7", "north arrow/scale bar skipped per plan (would add >10 lines); "
+    NOTES.append(("4.7", "UTM km grid + lon/lat edge labels, north arrow, 5 km scale bar, CRS/datum note (13 Sep); "
                           "station 170 has no koordinat in stations.yaml, resolved via the "
                           "catalog `stations` table instead"))
 
