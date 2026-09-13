@@ -91,9 +91,11 @@ CATALOG_ROWS = [
     ("station_graph_distance", "reference/jakarta/station_graph_distance.csv", "csv", "tabular", True,
      "derived: canal_graph", "Jarak jalur terpendek (km) antar stasiun dalam satu komponen graf"),
     ("sar_flood_extent", "validation/data/processed/sar/sar_scenes.csv", "csv", "tabular", True,
-     "validation/src/sar_flood_extent.py (Sentinel-1 RTC via Planetary Computer, VV < -16 dB minus referensi kering)",
-     "Metadata scene + luas genangan E2/E6/E7. CAVEAT 12 Sep: poligon terbesar = Teluk Jakarta (laut belum dimasker), "
-     "0 % laporan PetaBencana di dalam poligon, scene 1-4.5 hari setelah puncak -> BELUM VALID untuk IoU"),
+     "validation/src/sar_flood_extent.py (Sentinel-1 RTC via Planetary Computer; land clip, sea/DTM<=0.3m mask, "
+     "5x5 median, VV < -16 dB minus referensi kering)",
+     "Metadata scene + luas genangan E2/E6/E7 = 0.29/0.12/0.12 km2 setelah perbaikan 13 Sep. VERDICT: 0 % laporan "
+     "PetaBencana dalam 100 m di ketiga event, scene 24-108 jam setelah puncak -> SAR C-band tidak menangkap genangan "
+     "dangkal Jakut; TIDAK dipakai untuk IoU (lihat validation/data/processed/sar/summary.md)"),
     ("sar_flood_raster", "validation/data/processed/sar/flood_{event}.tif", "geotiff", "raster", False,
      "sar_flood_extent.py", "Mask genangan biner per event (uint8), UTM 48S - lihat caveat sar_flood_extent"),
     ("sar_flood_polygons", "validation/data/processed/sar/flood_{event}.geojson", "geojson", "vector", False,
